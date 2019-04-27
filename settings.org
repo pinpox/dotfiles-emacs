@@ -18,7 +18,6 @@
     display-line-numbers-current-absolute t)
   #+END_SRC
 
-
 * Packages
 ** Melpa
    #+BEGIN_SRC emacs-lisp
@@ -100,6 +99,13 @@ There are two things you can do about this warning:
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
     #+END_SRC
 
+*** Org Mode
+    Spap ; and : 
+    #+BEGIN_SRC emacs-lisp
+(define-key evil-motion-state-map ";" 'evil-ex)
+(define-key evil-motion-state-map ":" 'evil-repeat-find-char)
+    #+END_SRC
+
 *** Flycheck
     Syntax checker/linter
     #+BEGIN_SRC emacs-lisp
@@ -139,3 +145,4 @@ There are two things you can do about this warning:
     #+BEGIN_SRC emacs-lisp
 (which-key-mode)
     #+END_SRC
+    
