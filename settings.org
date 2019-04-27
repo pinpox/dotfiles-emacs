@@ -115,3 +115,30 @@ There are two things you can do about this warning:
 (require 'org-bullets)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+END_SRC
+
+*** Flycheck
+    Syntax checker/linter
+    #+BEGIN_SRC emacs-lisp
+(add-hook 'after-init-hook #'global-flycheck-mode)
+    #+END_SRC
+
+
+*** lsp-mode
+    LSP support
+    #+BEGIN_SRC emacs-lisp
+(require 'lsp-mode)
+    #+END_SRC
+
+
+*** lsp-ui
+    lsp-mode additions
+    #+BEGIN_SRC emacs-lisp
+(add-hook 'after-init-hook #'global-flycheck-mode)
+    #+END_SRC
+   
+*** lsp-java
+    #+BEGIN_SRC emacs-lisp
+(require 'lsp-java)
+(add-hook 'java-mode-hook #'lsp)
+    #+END_SRC
+
