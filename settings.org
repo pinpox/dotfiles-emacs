@@ -146,3 +146,11 @@ There are two things you can do about this warning:
 (which-key-mode)
     #+END_SRC
     
+*** spaceline
+    Show a nicer mode-line
+    #+BEGIN_SRC emacs-lisp
+(require 'spaceline-config)
+(setq powerline-default-separator 'slant)
+(spaceline-spacemacs-theme)
+    #+END_SRC
+    
