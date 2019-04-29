@@ -194,10 +194,7 @@
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
 (use-package ivy :ensure t
-  :diminish (ivy-mode . "")
   :bind
-  (:map ivy-mode-map
-   ("C-'" . ivy-avy))
   :config
   (ivy-mode 1)
   ;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
@@ -213,7 +210,7 @@
 	;; allow input not in order
         '((t   . ivy--regex-ignore-order))))
     #+END_SRC
-
+   
 *** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
     Emacs package that displays available keybindings in popup
     #+BEGIN_SRC emacs-lisp
@@ -249,19 +246,18 @@
     #+END_SRC
     
 * Keyboard mappings
-
   #+BEGIN_SRC emacs-lisp
   #+END_SRC
 
-* TODO
+* TODO 
 ** Packaes I want to add/look into
-   - use-package
-   - evil-leader
-   - magit 
+*** DONE use-package
+*** TODO evil-leader
+*** TODO magit 
 ** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
-   - Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
-   - Make package titles in this doc to links to the gitbhub repos
-   - A shortcut to edit my init file (a literate init file with Org mode, which is great).
-   - One key departure from Spacemacs: adding special modes like dired and VC to the evil-emacs-state-map, so that it uses the (usually consistent and mnemonic) default key bindings for those modes instead of mixing with Evil unpredictably.
-   - Using a mnemonic key mapping, e.g. keeping VC commands under leader-v and shell commands under leader-s.
-   - reference Spacemacs to get ideas for language-specific packages to install.
+*** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
+*** TODO Make package titles in this doc to links to the gitbhub repos
+*** TODO A shortcut to edit my init file (a literate init file with Org mode, which is great).
+*** TODO One key departure from Spacemacs: adding special modes like dired and VC to the evil-emacs-state-map, so that it uses the (usually consistent and mnemonic) default key bindings for those modes instead of mixing with Evil unpredictably.
+*** TODO Using a mnemonic key mapping, e.g. keeping VC commands under leader-v and shell commands under leader-s.
+*** TODO reference Spacemacs to get ideas for language-specific packages to install.
