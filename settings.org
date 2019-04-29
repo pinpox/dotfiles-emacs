@@ -19,45 +19,91 @@
   #+END_SRC
 
 * Packages
-** Melpa
-   #+BEGIN_SRC emacs-lisp
-
-
+  Get packages from MELPA too.
+  #+BEGIN_SRC emacs-lisp
 (require 'package)
-(let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  (when no-ssl
-    (warn "\
-Your version of Emacs does not support SSL connections,
-which is unsafe because it allows man-in-the-middle attacks.
-There are two things you can do about this warning:
-1. Install an Emacs version that does support SSL and be safe.
-2. Remove this warning from your init file so you won't see it again."))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
-(package-initialize) 
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")))
+(package-initialize)
+  #+END_SRC
 
-   #+END_SRC
+  From here-on out =use-package= loads packages. We almost always want to =:ensure= packages are present.
+  #+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+  #+END_SRC
 
 
 ** Installed Packages
-   
-*** Company mode
-    #+BEGIN_SRC emacs-lisp
- (require 'company)
-  (global-company-mode t)
-(add-hook 'after-init-hook 'global-company-mode)
-    #+END_SRC
+   The extensible vi layer for Emacs. 
 
 *** Evil Mode
     #+BEGIN_SRC emacs-lisp
-  (require 'evil)
-  (evil-mode 1)
+(use-package evil
+  :demand
+  :config (progn
+            (evil-mode 1)
+            (define-key evil-normal-state-map (kbd ";") 'evil-ex)
+	    (define-key evil-motion-state-map (kbd ":") 'evil-repeat-find-char)
+            (define-key evil-visual-state-map (kbd ";") 'evil-ex)))
+    #+END_SRC
+    
+*** Evil-leader
+    The package with the best name ever provides vim's leader key functinality
+    #+BEGIN_SRC emacs-lisp
+(use-package evil-leader
+  :demand
+  :config (progn
+            (setq evil-leader/in-all-states t)
+            (global-evil-leader-mode)))
+            
+
+
+(setq-default indent-tabs-mode nil)
+    #+END_SRC
+    
+
+*** Evil-org
+    https://github.com/Somelauw/evil-org-mode
+
+    #+BEGIN_SRC emacs-lisp
+
+    
+(use-package evil-org
+  :ensure t
+  :after org
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme)))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
+
+    #+END_SRC
+*** Evil commentray
+    Toggle comments in evil-mode
+    #+BEGIN_SRC emacs-lisp
+(use-package evil-commentary
+  :ensure t
+  :config
+  (evil-commentary-mode))
+    #+END_SRC
+
+*** Company mode
+    #+BEGIN_SRC emacs-lisp
+(use-package company
+  :demand
+  :config (progn
+            (add-hook 'prog-mode-hook #'(lambda () (company-mode)))
+            (setq company-show-numbers t)))
     #+END_SRC
 
 *** Yasnippet
@@ -99,39 +145,33 @@ There are two things you can do about this warning:
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
     #+END_SRC
 
-*** Org Mode
-    Spap ; and : 
-    #+BEGIN_SRC emacs-lisp
-(define-key evil-motion-state-map ";" 'evil-ex)
-(define-key evil-motion-state-map ":" 'evil-repeat-find-char)
-    #+END_SRC
-
 *** Flycheck
     Syntax checker/linter
     #+BEGIN_SRC emacs-lisp
-(add-hook 'after-init-hook #'global-flycheck-mode)
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
     #+END_SRC
 
 
-*** lsp-mode
+*** lsp-mode, lsp-ui and lsp-language specific pacakges
     LSP support
     #+BEGIN_SRC emacs-lisp
-(require 'lsp-mode)
-    #+END_SRC
+(use-package lsp-mode
+  :commands lsp
+  :init
+  ;; (setq ...)
+)
 
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package company-lsp :commands company-lsp)
 
-*** lsp-ui
-    lsp-mode additions
-    #+BEGIN_SRC emacs-lisp
+(require 'lsp-java)
+(add-hook 'java-mode-hook #'lsp)
+
 (add-hook 'after-init-hook #'global-flycheck-mode)
     #+END_SRC
    
-*** lsp-java
-    #+BEGIN_SRC emacs-lisp
-(require 'lsp-java)
-(add-hook 'java-mode-hook #'lsp)
-    #+END_SRC
-
 *** ivy
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
@@ -141,16 +181,52 @@ There are two things you can do about this warning:
     #+END_SRC
 
 *** which-key
-    Display help on partially entered commands (prefix)
+    Display help on partially entered commands (prefix), also enable support for god-mode
     #+BEGIN_SRC emacs-lisp
+(use-package which-key :demand)
 (which-key-mode)
+(which-key-enable-god-mode-support)
     #+END_SRC
     
 *** spaceline
     Show a nicer mode-line
     #+BEGIN_SRC emacs-lisp
-(require 'spaceline-config)
-(setq powerline-default-separator 'slant)
-(spaceline-spacemacs-theme)
+(use-package spaceline
+  :ensure t
+  :init
+  (require 'spaceline-config)
+  (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+  (setq powerline-default-separator 'slant)
+  (setq evil-normal-state-tag "NORMAL")
+  (setq evil-insert-state-tag "INSERT")
+  (setq evil-visual-state-tag "VISUAL")
+  (setq evil-emacs-state-tag "EMACS")
+  :config
+  (progn
+    (spaceline-define-segment buffer-id
+      (if (buffer-file-name)
+          (let ((project-root (projectile-project-p)))
+            (if project-root
+                (file-relative-name (buffer-file-name) project-root)
+              (abbreviate-file-name (buffer-file-name))))
+        (powerline-buffer-id)))
+    (spaceline-spacemacs-theme)
+    (spaceline-toggle-minor-modes-off)))
     #+END_SRC
     
+* Keyboard mappings
+
+  #+BEGIN_SRC emacs-lisp
+(evil-leader/set-leader "`")
+#+END_SRC
+
+* TODO
+** Packaes I want to add/look into
+   - use-package
+   - evil-leader
+   - magit 
+** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
+   - A shortcut to edit my init file (a literate init file with Org mode, which is great).
+   - One key departure from Spacemacs: adding special modes like dired and VC to the evil-emacs-state-map, so that it uses the (usually consistent and mnemonic) default key bindings for those modes instead of mixing with Evil unpredictably.
+   - Using a mnemonic key mapping, e.g. keeping VC commands under leader-v and shell commands under leader-s.
+   - reference Spacemacs to get ideas for language-specific packages to install.
