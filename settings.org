@@ -43,7 +43,7 @@
 ** Installed Packages
    The extensible vi layer for Emacs. 
 
-*** Evil Mode
+*** [[https://github.com/emacs-evil/evil][evil-mode]]
     #+BEGIN_SRC emacs-lisp
 (use-package evil
   :demand
@@ -54,7 +54,7 @@
             (define-key evil-visual-state-map (kbd ";") 'evil-ex)))
     #+END_SRC
     
-*** Evil-leader
+*** [[https://github.com/cofi/evil-leader][evil-leader]]
     The package with the best name ever provides vim's leader key functinality
     #+BEGIN_SRC emacs-lisp
 (use-package evil-leader
@@ -63,18 +63,13 @@
             (setq evil-leader/in-all-states t)
             (global-evil-leader-mode)))
             
-
-
+(evil-leader/set-leader "`")
 (setq-default indent-tabs-mode nil)
     #+END_SRC
-    
 
-*** Evil-org
-    https://github.com/Somelauw/evil-org-mode
-
+*** [[https://github.com/Somelauw/evil-org-mode][evil-org]]
+![An extensible vi layer for Emacs](https://raw.githubusercontent.com/emacs-evil/evil/master/doc/logo.png)
     #+BEGIN_SRC emacs-lisp
-
-    
 (use-package evil-org
   :ensure t
   :after org
@@ -85,10 +80,9 @@
               (evil-org-set-key-theme)))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
-
-
     #+END_SRC
-*** Evil commentray
+
+*** [[https://github.com/linktohack/evil-commentary][evil-commentray]]
     Toggle comments in evil-mode
     #+BEGIN_SRC emacs-lisp
 (use-package evil-commentary
@@ -97,7 +91,8 @@
   (evil-commentary-mode))
     #+END_SRC
 
-*** Company mode
+*** [[https://github.com/company-mode/company-mode][company-mode]]
+Modular in-buffer completion framework for Emacs
     #+BEGIN_SRC emacs-lisp
 (use-package company
   :demand
@@ -106,11 +101,14 @@
             (setq company-show-numbers t)))
     #+END_SRC
 
-*** Yasnippet
+*** [[https://github.com/joaotavora/yasnippet][yasnippet]]
+A template system for Emacs
     #+BEGIN_SRC emacs-lisp
-(require 'yasnippet)
-(yas-global-mode 1)
-
+  (use-package yasnippet
+    :config (progn
+              (yas-global-mode 1)
+              (add-to-list 'yas-snippet-dirs "~/.emacs.d/snippets")
+              (yas-load-directory "~/.emacs.d/snippets")))
 
   (defun check-expansion ()
     (save-excursion
@@ -138,17 +136,20 @@
 
     #+END_SRC
 
-*** Org Bullets
-    Make the bullets in Org-mode look nicer with UTF-8 characters
+*** [[https://github.com/sabof/org-bullets][org-bullets]]
+    Make the bullets in org-mode look nicer with UTF-8 characters
     #+BEGIN_SRC emacs-lisp
-(require 'org-bullets)
+(use-package org-bullets
+  :demand
+  :config 
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+)
     #+END_SRC
 
-*** Flycheck
-    Syntax checker/linter
+*** [[https://github.com/flycheck/flycheck][flycheck]]
+On the fly syntax checking
     #+BEGIN_SRC emacs-lisp
-(use-package flycheck
+ (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
     #+END_SRC
@@ -175,9 +176,26 @@
 *** ivy
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t
-            ivy-count-format "%d/%d ")
+(use-package ivy :ensure t
+  :diminish (ivy-mode . "")
+  :bind
+  (:map ivy-mode-map
+   ("C-'" . ivy-avy))
+  :config
+  (ivy-mode 1)
+  ;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
+  (setq ivy-use-virtual-buffers t)
+  ;; number of result lines to display
+  (setq ivy-height 10)
+ ;; set a default count format
+  (setq ivy-count-format "%d/%d")
+  ;; no regexp by default
+  ;; (setq ivy-initial-inputs-alist nil)
+  ;; configure regexp engine.
+  (setq ivy-re-builders-alist
+	;; allow input not in order
+        '((t   . ivy--regex-ignore-order))))
+
     #+END_SRC
 
 *** which-key
@@ -217,8 +235,7 @@
 * Keyboard mappings
 
   #+BEGIN_SRC emacs-lisp
-(evil-leader/set-leader "`")
-#+END_SRC
+  #+END_SRC
 
 * TODO
 ** Packaes I want to add/look into
@@ -226,6 +243,8 @@
    - evil-leader
    - magit 
 ** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
+   - Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
+   - Make package titles in this doc to links to the gitbhub repos
    - A shortcut to edit my init file (a literate init file with Org mode, which is great).
    - One key departure from Spacemacs: adding special modes like dired and VC to the evil-emacs-state-map, so that it uses the (usually consistent and mnemonic) default key bindings for those modes instead of mixing with Evil unpredictably.
    - Using a mnemonic key mapping, e.g. keeping VC commands under leader-v and shell commands under leader-s.
