@@ -154,8 +154,7 @@ On the fly syntax checking
   :init (global-flycheck-mode))
     #+END_SRC
 
-
-*** lsp-mode, lsp-ui and lsp-language specific pacakges
+*** [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]]
     LSP support
     #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
@@ -164,15 +163,33 @@ On the fly syntax checking
   ;; (setq ...)
 )
 
-(use-package lsp-ui :commands lsp-ui-mode)
-(use-package company-lsp :commands company-lsp)
-
-(require 'lsp-java)
-(add-hook 'java-mode-hook #'lsp)
-
 (add-hook 'after-init-hook #'global-flycheck-mode)
     #+END_SRC
-   
+*** [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]]
+    This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
+    #+BEGIN_SRC emacs-lisp
+(use-package lsp-ui
+  :config
+  (setq lsp-ui-sideline-enable nil
+        lsp-ui-doc-enable nil
+        lsp-ui-flycheck-enable t
+        lsp-ui-imenu-enable t
+        lsp-ui-sideline-ignore-duplicate t))
+(provide 'setup-lsp)
+    #+END_SRC
+    
+*** [[https://github.com/tigersoldier/company-lsp][company-lsp]]
+    #+BEGIN_SRC emacs-lisp
+(use-package company-lsp :commands company-lsp)
+    (push 'company-lsp company-backends)
+    #+END_SRC
+*** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
+    lsp-mode support for java
+    #+BEGIN_SRC emacs-lisp
+(use-package lsp-java :ensure t :after lsp
+  :config (add-hook 'java-mode-hook 'lsp))
+    #+END_SRC
+    
 *** ivy
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
