@@ -68,7 +68,7 @@
     #+END_SRC
 
 *** [[https://github.com/Somelauw/evil-org-mode][evil-org]]
-![An extensible vi layer for Emacs](https://raw.githubusercontent.com/emacs-evil/evil/master/doc/logo.png)
+    ![An extensible vi layer for Emacs](https://raw.githubusercontent.com/emacs-evil/evil/master/doc/logo.png)
     #+BEGIN_SRC emacs-lisp
 (use-package evil-org
   :ensure t
@@ -92,7 +92,7 @@
     #+END_SRC
 
 *** [[https://github.com/company-mode/company-mode][company-mode]]
-Modular in-buffer completion framework for Emacs
+    Modular in-buffer completion framework for Emacs
     #+BEGIN_SRC emacs-lisp
 (use-package company
   :demand
@@ -102,7 +102,7 @@ Modular in-buffer completion framework for Emacs
     #+END_SRC
 
 *** [[https://github.com/joaotavora/yasnippet][yasnippet]]
-A template system for Emacs
+    A template system for Emacs
     #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :config (progn
@@ -147,7 +147,7 @@ A template system for Emacs
     #+END_SRC
 
 *** [[https://github.com/flycheck/flycheck][flycheck]]
-On the fly syntax checking
+    On the fly syntax checking
     #+BEGIN_SRC emacs-lisp
  (use-package flycheck
   :ensure t
@@ -170,7 +170,7 @@ On the fly syntax checking
     #+BEGIN_SRC emacs-lisp
 (use-package lsp-ui
   :config
-  (setq lsp-ui-sideline-enable nil
+  (setq lsp-ui-sideline-enable t
         lsp-ui-doc-enable nil
         lsp-ui-flycheck-enable t
         lsp-ui-imenu-enable t
@@ -190,7 +190,7 @@ On the fly syntax checking
   :config (add-hook 'java-mode-hook 'lsp))
     #+END_SRC
     
-*** ivy
+*** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
 (use-package ivy :ensure t
@@ -212,18 +212,17 @@ On the fly syntax checking
   (setq ivy-re-builders-alist
 	;; allow input not in order
         '((t   . ivy--regex-ignore-order))))
-
     #+END_SRC
 
-*** which-key
-    Display help on partially entered commands (prefix), also enable support for god-mode
+*** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
+    Emacs package that displays available keybindings in popup
     #+BEGIN_SRC emacs-lisp
 (use-package which-key :demand)
 (which-key-mode)
 (which-key-enable-god-mode-support)
     #+END_SRC
     
-*** spaceline
+*** [[https://github.com/TheBB/spaceline][spaceline]]
     Show a nicer mode-line
     #+BEGIN_SRC emacs-lisp
 (use-package spaceline
