@@ -19,26 +19,26 @@
   #+END_SRC
 
 * Packages
-  Get packages from MELPA too.
-  #+BEGIN_SRC emacs-lisp
-(require 'package)
-(setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("melpa-stable" . "https://stable.melpa.org/packages/")))
-(package-initialize)
-  #+END_SRC
+** Repositorys
+   Get packages from MELPA too.
+   #+BEGIN_SRC emacs-lisp
+ (require 'package)
+ (setq package-archives
+       '(("gnu" . "https://elpa.gnu.org/packages/")
+         ("melpa" . "https://melpa.org/packages/")
+         ("melpa-stable" . "https://stable.melpa.org/packages/")))
+ (package-initialize)
+   #+END_SRC
 
-  From here-on out =use-package= loads packages. We almost always want to =:ensure= packages are present.
-  #+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+   From here-on out =use-package= loads packages. We almost always want to =:ensure= packages are present.
+   #+BEGIN_SRC emacs-lisp
+   (unless (package-installed-p 'use-package)
+     (package-refresh-contents)
+     (package-install 'use-package))
 
-  (require 'use-package)
-  (setq use-package-always-ensure t)
-  #+END_SRC
-
+   (require 'use-package)
+   (setq use-package-always-ensure t)
+   #+END_SRC
 
 ** Installed Packages
    The extensible vi layer for Emacs. 
@@ -193,7 +193,7 @@
 *** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
-(use-package ivy :ensure t
+(use-package counsel :ensure t
   :bind
   :config
   (ivy-mode 1)
@@ -245,14 +245,52 @@
     (spaceline-toggle-minor-modes-off)))
     #+END_SRC
     
+*** [[https://github.com/dgutov/diff-hl][diff-hl]]
+    Show git diff gutter
+    #+BEGIN_SRC emacs-lisp
+    (use-package diff-hl
+  :ensure t
+  :config
+  (global-diff-hl-mode +1)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+    #+END_SRC
+*** [[https://github.com/noctuid/general.el][general.el]]
+    More convenient key definitions in emacs
+    #+BEGIN_SRC emacs-lisp
+    (general-define-key
+ :states '(normal visual insert emacs)
+ :prefix "SPC"
+ :non-normal-prefix "M-SPC"
+  ;; General stuff
+  "SPC" '(counsel-M-x :which-key "M-x")
+  "TAB" '(ivy-switch-buffer :which-key "prev buffer")
+  "ESC" 'keyboard-quit
+  "/" '(counsel-ag :wich-key "ag")
+  "." '(avy-goto-word-or-subword-1  :which-key "go to word")
+  "a" '(hydra-launcher/body :which-key "Applications")
+  "b" '(hydra-buffer/body t :which-key "Buffer")
+  "c" '(:ignore t :which-key "Comment")
+  "cl" '(comment-or-uncomment-region-or-line :which-key "comment line")
+  "w" '(hydra-window/body :which-key "Window")
+  ;; Files
+  "f" '(:ignore t :which-key "Files")
+  "fd" '(counsel-git :which-key "find in git dir")
+  "ff" '(counsel-find-file :which-key "open file")
+  )
+    #+END_SRC
 * Keyboard mappings
   #+BEGIN_SRC emacs-lisp
   #+END_SRC
 
 * TODO 
+** packages missing from use-package
+*** TODO counsel
+*** TODO general.el
 ** Packaes I want to add/look into
 *** DONE use-package
-*** TODO evil-leader
+*** DONE evil-leader
+    Dont need it for now
 *** TODO magit 
 ** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
 *** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
