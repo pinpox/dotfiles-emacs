@@ -253,45 +253,42 @@
       :prefix "SPC"
       :non-normal-prefix "M-SPC"
        ;; General stuff
-       "SPC" '(counsel-M-x :which-key "M-x")
-       "ESC" 'keyboard-quit
-       "/" '(counsel-ag :wich-key "ag")
-       "." '(avy-goto-word-or-subword-1  :which-key "go to word")
-       ;; "a" '(hydra-launcher/body :which-key "Applications")
-       ;; "b" '(hydra-buffer/body t :which-key "Buffer")
-       "c" '(:ignore t :which-key "comment")
-       "cl" '(comment-or-uncomment-region-or-line :which-key "comment line")
-       ;; "w" '(hydra-window/body :which-key "Window")
+       "SPC"	'(counsel-M-x :which-key "M-x")
+       "ESC"	'keyboard-quit
+       "/"	'(counsel-ag :wich-key "ag")
+       "."	'(avy-goto-word-or-subword-1  :which-key "go to word")
+       ;; "a"	'(hydra-launcher/body :which-key "Applications")
+       ;; "b"	'(hydra-buffer/body t :which-key "Buffer")
+       "c"	'(:ignore t :which-key "comment")
+       "cl"	'(comment-or-uncomment-region-or-line :which-key "comment line")
+       ;; "w"	'(hydra-window/body :which-key "Window")
        
        ;; Files
-       "f" '(:ignore t :which-key "files")
-       "fd" '(counsel-git :which-key "find in git dir")
-       "ff" '(counsel-find-file :which-key "open file")
-       "fr" '(counsel-recentf :which-key "recent-files")
+       "f"	'(:ignore t :which-key "files")
+       "fd"	'(counsel-git :which-key "find in git dir")
+       "ff"	'(counsel-find-file :which-key "open file")
+       "fr"	'(counsel-recentf :which-key "recent-files")
        
        ;; Applicartions
-       "a" '(:ignore t :which-key "applications")
+       "a"	'(:ignore t :which-key "applications")
        
        ;; Configs
-       "c" '(:ignore t :which-key "configs")
+       "c"	'(:ignore t :which-key "configs")
        
        ;; Windows
-       "w" '(:ignore t :which-key "windows")
-       "wd" '(delete-window :which-key "delete window")
-       "ws" '(split-window-right :which-key "split vertical")
-       "wS" '(split-window-below :which-key "split horizontal")
+       "w"	'(:ignore t :which-key "windows")
+       "wd"	'(delete-window :which-key "delete window")
+       "ws"	'(split-window-right :which-key "split vertical")
+       "wS"	'(split-window-below :which-key "split horizontal")
        
        ;; Buffers TODO edit, eval..
-       "b" '(:ignore t :which-key "buffers")
-       "bd" '(kill-buffer-and-window :which-key "kill buffer and window")
-       "TAB" '(ivy-switch-buffer :which-key "switch buffer")
+       "b"	'(:ignore t :which-key "buffers")
+       "bd"	'(kill-buffer-and-window :which-key "kill buffer and window")
+       "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
        ;; Projects
-       "p" '(:ignore t :which-key "projects")
+       "p"	'(:ignore t :which-key "projects")
        )
     #+END_SRC
-* Keyboard mappings
-  #+BEGIN_SRC emacs-lisp
-  #+END_SRC
 
 * TODO 
 ** packages missing from use-package
