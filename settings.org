@@ -2,26 +2,50 @@
   Removes the menu,tool and scrollbars along with the splash-screen.
 
   #+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-  (setq inhibit-splash-screen t)
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (setq inhibit-splash-screen t)
+  #+END_SRC
+
+Also install some themes. I load gruvbox per default and switch sometimes.
+  #+BEGIN_SRC emacs-lisp
+    (use-package gruvbox-theme :ensure t :defer t)
+    (use-package base16-theme :ensure t :defer t)
+    (load-theme 'gruvbox-dark-hard)
   #+END_SRC
 
 * General Options
   Enable relative line numbers, disable the creation of file-backups when editing.
-
   #+BEGIN_SRC emacs-lisp
-  (global-hl-line-mode 1)			;; Highlight current line
-  (setq make-backup-files nil)			;; Don't make backup files when editing
-  (setq-default display-line-numbers 'relative	;; Display relative line-numbers
-    display-line-numbers-current-absolute t)	;; Show absolute line number for current line
-  (show-paren-mode 1)				;; Show matching parenthesis
-  (setq show-paren-delay 0)			;; Show it immediately, don't delay
+    (global-hl-line-mode 1)								;; Highlight current line
+    (setq make-backup-files nil)							;; Don't make backup files when editing
+    (setq-default display-line-numbers 'relative					;; Display relative line-numbers
+	display-line-numbers-current-absolute t)					;; Show absolute line number for current line
+    (show-paren-mode 1)									;; Show matching parenthesis
+    (setq show-paren-delay 0)								;; Show it immediately, don't delay
+  #+END_SRC
+
+  Use UTF-8 by default
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (prefer-coding-system        'utf-8)
+    (set-language-environment    'utf-8)
+    (set-default-coding-systems  'utf-8)
+    (set-terminal-coding-system  'utf-8)
+    (set-selection-coding-system 'utf-8)
+  #+END_SRC
+
+  Indentation and trailing whitespace
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (setq standard-indent 2)
+    (setq-default tab-width 2)
+    (setq-default indent-tabs-mode nil)
+    (setq show-trailing-whitespace t)
+    (add-hook 'before-save-hook 'delete-trailing-whitespace)
   #+END_SRC
 
 * Packages
-** Repositorys
+** Repositories
    Get packages from MELPA too.
    #+BEGIN_SRC emacs-lisp
    (require 'package)
@@ -42,32 +66,20 @@
    #+END_SRC
 
 ** Installed Packages
-   The extensible vi layer for Emacs. 
+   The extensible vi layer for Emacs.
 *** [[https://github.com/emacs-evil/evil][evil-mode]]
     #+BEGIN_SRC emacs-lisp
     (use-package evil
       :demand
       :config (progn
-        (evil-mode 1)						;; Enable evil mode everywhere
-        (define-key evil-normal-state-map (kbd ";") 'evil-ex)	;; Swap ; and : for easier command entering (normal mode)
-        (define-key evil-visual-state-map (kbd ";") 'evil-ex)	;; Swap ; and : for easier command entering (visual mode)
+        (evil-mode 1)									;; Enable evil mode everywhere
+        (define-key evil-normal-state-map (kbd ";") 'evil-ex)				;; Swap ; and : for easier command entering (normal mode)
+        (define-key evil-visual-state-map (kbd ";") 'evil-ex)				;; Swap ; and : for easier command entering (visual mode)
 	(define-key evil-motion-state-map (kbd ":") 'evil-repeat-find-char)))
     #+END_SRC
-    
-    # *** [[https://github.com/cofi/evil-leader][evil-leader]]
-    #     The package with the best name ever provides vim's leader key functinality
-    #     #+BEGIN_SRC emacs-lisp
-    # (use-package evil-leader
-    #   :demand
-    #   :config (progn
-    #             (setq evil-leader/in-all-states t)
-    #             (global-evil-leader-mode)))
-            
-    # (evil-leader/set-leader "`")
-    # (setq-default indent-tabs-mode nil)
-    #     #+END_SRC
 
 *** [[https://github.com/Somelauw/evil-org-mode][evil-org]]
+    Evil bindings for org-mode
     #+BEGIN_SRC emacs-lisp
     (use-package evil-org
       :ensure t
@@ -81,7 +93,7 @@
       (evil-org-agenda-set-keys))
     #+END_SRC
 
-*** [[https://github.com/linktohack/evil-commentary][evil-commentray]]
+*** [[https://github.com/linktohack/evil-commentary][evil-commentary]]
     Toggle comments in evil-mode
     #+BEGIN_SRC emacs-lisp
     (use-package evil-commentary
@@ -107,7 +119,7 @@
     (use-package yasnippet
       :ensure t
       :init
-      (yas-global-mode 1))   
+      (yas-global-mode 1))
     (defvar company-mode/enable-yas t
       "Enable yasnippet for all backends.")
 
@@ -118,13 +130,13 @@
       '(:with company-yasnippet))))
     (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
     #+END_SRC
-    
+
 *** [[https://github.com/sabof/org-bullets][org-bullets]]
     Make the bullets in org-mode look nicer with UTF-8 characters
     #+BEGIN_SRC emacs-lisp
     (use-package org-bullets
       :demand
-      :config 
+      :config
       (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
     #+END_SRC
 
@@ -142,11 +154,11 @@
     (use-package lsp-mode
       :commands lsp
       :init
-      ;; (setq ...)
+											;; (setq ...)
     )
     (add-hook 'after-init-hook #'global-flycheck-mode)
     #+END_SRC
-    
+
 *** [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]]
     This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
     #+BEGIN_SRC emacs-lisp
@@ -159,20 +171,20 @@
         lsp-ui-sideline-ignore-duplicate t))
     (provide 'setup-lsp)
     #+END_SRC
-    
+
 *** [[https://github.com/tigersoldier/company-lsp][company-lsp]]
     #+BEGIN_SRC emacs-lisp
     (use-package company-lsp :commands company-lsp)
     (push 'company-lsp company-backends)
     #+END_SRC
-    
+
 *** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
     lsp-mode support for java
     #+BEGIN_SRC emacs-lisp
     (use-package lsp-java :ensure t :after lsp
       :config (add-hook 'java-mode-hook 'lsp))
     #+END_SRC
-    
+
 *** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
@@ -180,14 +192,14 @@
       :bind
       :config
       (ivy-mode 1)
-      (setq ivy-use-virtual-buffers t)	;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
-      (setq ivy-height 10)		;; number of result lines to display
-      (setq ivy-count-format "%d/%d ")	;; set a default count format
-					;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
+      (setq ivy-use-virtual-buffers t)							;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
+      (setq ivy-height 10)								;; number of result lines to display
+      (setq ivy-count-format "%d/%d ")							;; set a default count format
+											;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
       (setq ivy-re-builders-alist
-        '((t   . ivy--regex-fuzzy))))	;; configure regexp engine to use fuzzy finding
+        '((t   . ivy--regex-fuzzy))))							;; configure regexp engine to use fuzzy finding
     #+END_SRC
-   
+
 *** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
     Emacs package that displays available keybindings in popup
     #+BEGIN_SRC emacs-lisp
@@ -195,7 +207,7 @@
     (which-key-mode)
     (which-key-enable-god-mode-support)
     #+END_SRC
-    
+
 *** [[https://github.com/TheBB/spaceline][spaceline]]
     Show a nicer mode-line
     #+BEGIN_SRC emacs-lisp
@@ -211,19 +223,19 @@
 	(setq evil-emacs-state-tag "EMACS")
 	:config
 	(progn
-	  (;; spaceline-define-segment buffer-id
-	   ;;  ( if (buffer-file-name)
-	   ;;       (let ((project-root (projectile-project-p)))
-	   ;;         (if project-root
-	   ;;             (file-relative-name (buffer-file-name) project-root)
-	   ;;           (abbreviate-file-name (buffer-file-name))))
-	   ;;     (powerline-buffer-id)
-	   ;; 	)
+	  (										;; spaceline-define-segment buffer-id
+											;;  ( if (buffer-file-name)
+											;;       (let ((project-root (projectile-project-p)))
+											;;         (if project-root
+											;;             (file-relative-name (buffer-file-name) project-root)
+											;;           (abbreviate-file-name (buffer-file-name))))
+											;;     (powerline-buffer-id)
+											;; 	)
 	    )
 	  (spaceline-spacemacs-theme)
 	  (spaceline-toggle-minor-modes-off)))
     #+END_SRC
-    
+
 *** [[https://github.com/dgutov/diff-hl][diff-hl]]
     Show git diff gutter
     #+BEGIN_SRC emacs-lisp
@@ -234,82 +246,118 @@
 	(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
 	(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
     #+END_SRC
-    
+
 *** [[https://github.com/noctuid/general.el][general.el]]
     More convenient key definitions in emacs
     #+BEGIN_SRC emacs-lisp
-         (general-define-key
+    (use-package general)
+    (general-define-key
       :states '(normal visual insert emacs)
       :prefix "SPC"
       :non-normal-prefix "M-SPC"
-       ;; General stuff
+											;; General stuff
        "SPC"	'(counsel-M-x :which-key "M-x")
        "ESC"	'keyboard-quit
        "/"	'(counsel-ag :wich-key "ag")
        "."	'(avy-goto-word-or-subword-1  :which-key "go to word")
-       ;; "a"	'(hydra-launcher/body :which-key "Applications")
-       ;; "b"	'(hydra-buffer/body t :which-key "Buffer")
+											;; "a"	'(hydra-launcher/body :which-key "Applications")
+											;; "b"	'(hydra-buffer/body t :which-key "Buffer")
        "c"	'(:ignore t :which-key "comment")
        "cl"	'(comment-or-uncomment-region-or-line :which-key "comment line")
-       ;; "w"	'(hydra-window/body :which-key "Window")
-       
-       ;; Files
+											;; "w"	'(hydra-window/body :which-key "Window")
+
+											;; Files
        "f"	'(:ignore t :which-key "files")
        "fd"	'(counsel-git :which-key "find in git dir")
        "ff"	'(counsel-find-file :which-key "open file")
        "fr"	'(counsel-recentf :which-key "recent-files")
-       
-       ;; Applicartions
+
+											;; Applicartions
        "a"	'(:ignore t :which-key "applications")
-       
-       ;; Configs
+
+											;; Configs
        "c"	'(:ignore t :which-key "configs")
-       
-       ;; Windows
+
+											;; Windows
        "w"	'(:ignore t :which-key "windows")
        "wd"	'(delete-window :which-key "delete window")
        "ws"	'(split-window-right :which-key "split vertical")
        "wS"	'(split-window-below :which-key "split horizontal")
-       
-       ;; Buffers TODO edit, eval..
+
+											;; Buffers TODO edit, eval..
        "b"	'(:ignore t :which-key "buffers")
        "bd"	'(kill-buffer-and-window :which-key "kill buffer and window")
        "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
-       ;; Projects
+											;; Projects
        "p"	'(:ignore t :which-key "projects")
        )
     #+END_SRC
 *** [[https://github.com/emacs-dashboard/emacs-dashboard][emacs-dashbord]]
     Display a startup dashboard
     #+BEGIN_SRC emacs-lisp
-    (use-package dashboard
-	:ensure t
-	:config
-	(dashboard-setup-startup-hook))
-	(setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-	(setq dashboard-items '((recents  . 5)
-	    (bookmarks . 5)
-	    ;; (projects . 5)
-	    (agenda . 5)
-	    (registers . 5)
-	))
+        (use-package dashboard
+      :ensure t
+      :config
+      (dashboard-setup-startup-hook))
+      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+      (setq dashboard-items '((recents  . 5)
+          (bookmarks . 5)
+          (projects . 5)
+          (agenda . 5)
+          (registers . 5)
+      ))
 
-	(setq dashboard-banner-logo-title "Happy hacking.")	;; Set the title
-	(setq dashboard-startup-banner "~/.emacs.d/pc.png")	;; Set the banner
-	(setq dashboard-center-content t)			;; Center content 
+      (setq dashboard-banner-logo-title "Happy hacking.")				;; Set the title
+      (setq dashboard-startup-banner "~/.emacs.d/pc.png")				;; Set the banner
+      (setq dashboard-center-content t)						;; Center content
+
+
+
     #+END_SRC
 
-* TODO 
+*** [[https://github.com/bbatsov/projectile][projectile]]
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package projectile
+	:bind-keymap
+											;; ("C-c p" . projectile-command-map)
+	)
+    #+END_SRC
+
+* magit
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package magit
+    :ensure t
+    :defer t
+											;; :bind (("C-x g" . magit-status))
+    :config
+    (progn
+      (defun inkel/magit-log-edit-mode-hook ()
+	(setq fill-column 72)
+	(flyspell-mode t)
+	(turn-on-auto-fill))
+      (add-hook 'magit-log-edit-mode-hook 'inkel/magit-log-edit-mode-hook)
+      (defadvice magit-status (around magit-fullscreen activate)
+	(window-configuration-to-register :magit-fullscreen)
+	ad-do-it
+  (delete-other-windows))))
+#+END_SRC
+
+* TODO
 ** packages missing from use-package
-*** TODO counsel
-*** TODO general.el
+*** DONE counsel
+*** DONE general.el
 ** Packaes I want to add/look into
+*** TODO projectile
+**** DONE install
+**** TODO figure out how it works
+*** TODO magit
+**** DONE install
+**** TODO figure out how it works
 *** DONE use-package
 *** DONE evil-leader (Dont need it for now)
 *** TODO evil-textobj-between.el
 *** TODO flx https://oremacs.com/2016/01/06/ivy-flx/
-*** TODO projectile
-*** TODO magit 
 ** Stuff that doesn't work yet
 *** Show yasnippets' snippets in company completion when typing
 ** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
