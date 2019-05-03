@@ -85,6 +85,15 @@
       (evil-org-agenda-set-keys))
     #+END_SRC
 
+*** [[https://github.com/emacs-evil/evil-magit][evil-magit]]
+    Evil keybingings for magit
+    #+BEGIN_SRC emacs-lisp :tangle yes
+          (use-package evil-magit
+              ;; :config
+              ;; (evil-leader/set-key "gs" 'magit-status)
+      )
+    #+END_SRC
+
 *** [[https://github.com/linktohack/evil-commentary][evil-commentary]]
     Toggle comments in evil-mode
     #+BEGIN_SRC emacs-lisp
