@@ -41,7 +41,7 @@
     ("a22f40b63f9bc0a69ebc8ba4fbc6b452a4e3f84b80590ba0a92b4ff599e53ad0" default)))
  '(package-selected-packages
    (quote
-    (projectile magit yasnippet-snippets yasnippet-classic-snippets which-key use-package twilight-theme twilight-anti-bright-theme spaceline snazzy-theme org-bullets lsp-ui lsp-java lenlen-theme ivy-hydra gruvbox-theme graphviz-dot-mode go-eldoc git-gutter general fzf flycheck evil-org evil-leader evil-commentary diff-hl dashboard cycle-themes counsel-tramp company-quickhelp company-lsp company-go ample-theme))))
+    (format-all yasnippet-snippets which-key use-package spaceline snazzy-theme org-caldav org-bullets magit lsp-ui lsp-java gruvbox-theme general flycheck evil-org evil-leader evil-commentary diff-hl dashboard counsel-projectile company-lsp avy))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
