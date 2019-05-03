@@ -313,7 +313,7 @@ Auto-format source code in many languages with one command
         ;;     ("s"  . pdf-occur)
         ;;     ("b"  . pdf-view-set-slice-from-bounding-box)
         ;;     ("r"  . pdf-view-reset-slice)
-        )
+        ;; )
       (use-package org-pdfview
         :ensure t))
     #+END_SRC
