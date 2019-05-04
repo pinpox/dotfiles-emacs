@@ -1,17 +1,4 @@
 * Repositories
-  Get packages from MELPA too.
-  #+BEGIN_SRC emacs-lisp
-    (require 'package)
-
-    (setq package-archives '(("org" . "http://orgmode.org/elpa/")
-                             ("melpa" . "http://melpa.org/packages/")
-                             ("melpa-stable" . "http://stable.melpa.org/packages/")
-                             ("gnu" . "https://elpa.gnu.org/packages/")))
-
-    (setq package-enable-at-startup nil)
-    (package-initialize)
-  #+END_SRC
-
   From here-on out =use-package= loads packages. We almost always want to =:ensure= packages are present.
   #+BEGIN_SRC emacs-lisp
     (unless (package-installed-p 'use-package)
@@ -110,8 +97,8 @@
       (use-package evil
         :ensure t
         :init
-        (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-        ;; (setq evil-want-keybinding nil)
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
                   :config (progn
                             (evil-mode 1)                                                         ;; Enable evil mode everywhere
                             (define-key evil-normal-state-map (kbd ";") 'evil-ex)                 ;; Swap ; and : for easier command entering (normal mode)
@@ -123,8 +110,8 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-collection
         :after evil
-        :custom
         :ensure t
+        :custom
         (evil-collection-setup-minibuffer t)
         :config
         (setq evil-collection-mode-list (delete 'dired evil-collection-mode-list))
@@ -355,9 +342,23 @@ Auto-format source code in many languages with one command
 *** [[https://github.com/noctuid/general.el][general.el]]
     More convenient key definitions in emacs
     #+BEGIN_SRC emacs-lisp
-    (use-package general)
+    (use-package general
+    :ensure t
+    :init
+    (setq general-override-states '(insert
+                                  emacs
+                                  hybrid
+                                  normal
+                                  visual
+                                  motion
+                                  operator
+                                  replace))
+
+
+    :config
     (general-define-key
-      :states '(normal visual insert emacs)
+      :states '(normal visual insert emacs motion)
+      :keymaps 'override
       :prefix "SPC"
       :non-normal-prefix "M-SPC"
 											;; General stuff
@@ -395,7 +396,7 @@ Auto-format source code in many languages with one command
        "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
 											;; Projects
        "p"	'(:ignore t :which-key "projects")
-       )
+       ))
     #+END_SRC
 *** [[https://github.com/emacs-dashboard/emacs-dashboard][emacs-dashbord]]
     Display a startup dashboard
