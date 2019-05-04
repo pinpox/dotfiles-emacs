@@ -2,19 +2,14 @@
   Get packages from MELPA too.
   #+BEGIN_SRC emacs-lisp
     (require 'package)
-    (setq package-archives
-          '(("gnu" . "https://elpa.gnu.org/packages/")
-            ("melpa" . "http://melpa.milkbox.net/packages/")
-            ("melpa-stable" . "https://stable.melpa.org/packages/")))
 
+    (setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                             ("melpa" . "http://melpa.org/packages/")
+                             ("melpa-stable" . "http://stable.melpa.org/packages/")
+                             ("gnu" . "https://elpa.gnu.org/packages/")))
 
+    (setq package-enable-at-startup nil)
     (package-initialize)
-
-    (when (>= emacs-major-version 24)
-      (require 'package)
-      (package-initialize)
-      (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-      )
   #+END_SRC
 
   From here-on out =use-package= loads packages. We almost always want to =:ensure= packages are present.
@@ -65,11 +60,49 @@
     (add-hook 'before-save-hook 'delete-trailing-whitespace)
   #+END_SRC
 
+    Personal information
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (setq user-full-name "Pablo Ovelleiro Corral"
+          user-mail-address "pablo1@mailbox.org")
+  #+END_SRC
+
   Integrate pass for password-management
   #+BEGIN_SRC emacs-lisp :tangle yes
     (require 'auth-source-pass)
     (auth-source-pass-enable)
   #+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ;;;;; Scrolling
+  ;; Default behaviour when point goes off screen is to scroll until
+  ;; point is in the middle of the screen. This is hard to follow
+  ;; for me, so I change the settings so that emacs only scrolls
+  ;; line by line.
+
+  ;; =scroll-conservatively= is still 0, but the low values of
+  ;; =scroll-(up|down)-aggressively= ensure the smooth scrolling.
+  (setq-default scroll-margin 3
+          scroll-conservatively 0
+          scroll-up-aggressively 0.01
+          scroll-down-aggressively 0.01)
+
+  ;;;;; Sentences end with .
+  (setq sentence-end-double-space nil)
+
+  ;;;;; Default fill column
+  (setq default-fill-column 80)
+
+  ;;;;; Initial startup message
+  (setq initial-scratch-message "Startup finished !")
+
+  ;;;;; Initial buffer
+  (setq remember-notes-initial-major-mode 'org-mode)
+  (setq remember-data-file "~/org/notes.org")
+  ;; (setq initial-buffer-choice 'remember-notes)
+
+#+END_SRC
+
 * Installed Packages
   The extensible vi layer for Emacs.
 *** [[https://github.com/emacs-evil/evil][evil-mode]]
@@ -88,11 +121,14 @@
     #+END_SRC
 *** [[https://github.com/emacs-evil/evil-collection][evil-collection]]
     #+BEGIN_SRC emacs-lisp :tangle yes
-      ;; (use-package evil-collection
-      ;;   :after evil
-      ;;   :ensure t
-      ;;   :config
-      ;;   (evil-collection-init))
+      (use-package evil-collection
+        :after evil
+        :custom
+        :ensure t
+        (evil-collection-setup-minibuffer t)
+        :config
+        (setq evil-collection-mode-list (delete 'dired evil-collection-mode-list))
+        (evil-collection-init))
     #+END_SRC
 *** [[https://github.com/Somelauw/evil-org-mode][evil-org]]
     Evil bindings for org-mode
