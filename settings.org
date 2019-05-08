@@ -6,6 +6,8 @@
       (package-install 'use-package))
     (require 'use-package)
     (setq use-package-always-ensure t)
+    (setq backup-directory-alist
+          `(("." . ,(concat user-emacs-directory "emacs-backups"))))
   #+END_SRC
 
 * Appearance
@@ -136,10 +138,7 @@
 *** [[https://github.com/emacs-evil/evil-magit][evil-magit]]
     Evil keybingings for magit
     #+BEGIN_SRC emacs-lisp :tangle yes
-      ;;     (use-package evil-magit
-      ;;         ;; :config
-      ;;         ;; (evil-leader/set-key "gs" 'magit-status)
-      ;; )
+          (use-package evil-magit)
     #+END_SRC
 
 *** [[https://github.com/linktohack/evil-commentary][evil-commentary]]
@@ -342,61 +341,68 @@ Auto-format source code in many languages with one command
 *** [[https://github.com/noctuid/general.el][general.el]]
     More convenient key definitions in emacs
     #+BEGIN_SRC emacs-lisp
-    (use-package general
-    :ensure t
-    :init
-    (setq general-override-states '(insert
-                                  emacs
-                                  hybrid
-                                  normal
-                                  visual
-                                  motion
-                                  operator
-                                  replace))
+      (use-package general
+      :ensure t
+      :init
+      (setq general-override-states '(insert
+                                    emacs
+                                    hybrid
+                                    normal
+                                    visual
+                                    motion
+                                    operator
+                                    replace))
 
 
-    :config
-    (general-define-key
-      :states '(normal visual insert emacs motion)
-      :keymaps 'override
-      :prefix "SPC"
-      :non-normal-prefix "M-SPC"
-											;; General stuff
-       "SPC"	'(counsel-M-x :which-key "M-x")
-       "ESC"	'keyboard-quit
-       "/"	'(counsel-ag :wich-key "ag")
-       "."	'(avy-goto-word-or-subword-1  :which-key "go to word")
-											;; "a"	'(hydra-launcher/body :which-key "Applications")
-											;; "b"	'(hydra-buffer/body t :which-key "Buffer")
-       "c"	'(:ignore t :which-key "comment")
-       "cl"	'(comment-or-uncomment-region-or-line :which-key "comment line")
-											;; "w"	'(hydra-window/body :which-key "Window")
+      :config
+      (general-define-key
+        :states '(normal visual insert emacs motion)
+        :keymaps 'override
+        :prefix "SPC"
+        :non-normal-prefix "M-SPC"
+                        ;; General stuff
+         "SPC"	'(counsel-M-x :which-key "M-x")
+         "ESC"	'keyboard-quit
+         "/"	'(counsel-ag :wich-key "ag")
+         "."	'(avy-goto-word-or-subword-1  :which-key "go to word")
+                        ;; "a"	'(hydra-launcher/body :which-key "Applications")
+                        ;; "b"	'(hydra-buffer/body t :which-key "Buffer")
+         "c"	'(:ignore t :which-key "comment")
+         "cl"	'(comment-or-uncomment-region-or-line :which-key "comment line")
+                        ;; "w"	'(hydra-window/body :which-key "Window")
 
-											;; Files
-       "f"	'(:ignore t :which-key "files")
-       "fd"	'(counsel-git :which-key "find in git dir")
-       "ff"	'(counsel-find-file :which-key "open file")
-       "fr"	'(counsel-recentf :which-key "recent-files")
+                        ;; Files
+         "f"	'(:ignore t :which-key "files")
+         "fd"	'(counsel-git :which-key "find in git dir")
+         "ff"	'(counsel-find-file :which-key "open file")
+         "fr"	'(counsel-recentf :which-key "recent-files")
 
-											;; Applicartions
-       "a"	'(:ignore t :which-key "applications")
+                        ;; Applicartions
+         "a"	'(:ignore t :which-key "Applications")
+         "g"	'(:ignore t :which-key "Git")
 
-											;; Configs
-       "c"	'(:ignore t :which-key "configs")
+                        ;; Configs
+         "c"	'(:ignore t :which-key "Config")
 
-											;; Windows
-       "w"	'(:ignore t :which-key "windows")
-       "wd"	'(delete-window :which-key "delete window")
-       "ws"	'(split-window-right :which-key "split vertical")
-       "wS"	'(split-window-below :which-key "split horizontal")
+                        ;; Windows
+         "w"	'(:ignore t :which-key "Window")
+         "wd"	'(delete-window :which-key "delete window")
+         "ws"	'(split-window-right :which-key "split vertical")
+         "wS"	'(split-window-below :which-key "split horizontal")
 
-											;; Buffers TODO edit, eval..
-       "b"	'(:ignore t :which-key "buffers")
-       "bd"	'(kill-buffer-and-window :which-key "kill buffer and window")
-       "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
-											;; Projects
-       "p"	'(:ignore t :which-key "projects")
-       ))
+                        ;; Buffers TODO edit, eval..
+         "b"	'(:ignore t :which-key "Buffer")
+         "bd"	'(kill-buffer-and-window :which-key "kill buffer and window")
+         "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
+                        ;; Projects
+         "p" '(:ignore t :which-key "Project")
+         "pp" '(counsel-projectile :which-key "Switch project")
+         "pf" '(counsel-projectile-find-file :which-key "Project file")
+         "p/" '(counsel-projectile-ag :which-key "Search project")
+
+
+
+         ))
     #+END_SRC
 *** [[https://github.com/emacs-dashboard/emacs-dashboard][emacs-dashbord]]
     Display a startup dashboard
@@ -424,9 +430,18 @@ Auto-format source code in many languages with one command
         :bind-keymap
         ;; ("C-c p" . projectile-command-map)
         :config
-        (setq projectile-project-search-path '("~/Projects/", "~/Documents/")))
+        (setq projectile-project-search-path '("~/Projects/" "~/Documents/" "~/org-files")))
+      (projectile-mode +1)
     #+END_SRC
 
+
+*** [[https://github.com/ericdanan/counsel-projectile][counsel-projectile]]
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package counsel-projectile
+        :ensure t
+        :config
+        (counsel-projectile-mode))
+    #+END_SRC
 *** magit
 
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -451,6 +466,7 @@ Auto-format source code in many languages with one command
 
 
     #+END_SRC
+
 
 *** Themes
     Also install some themes. I load gruvbox per default and switch sometimes.
