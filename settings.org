@@ -83,7 +83,7 @@
   (setq default-fill-column 80)
 
   ;;;;; Initial startup message
-  (setq initial-scratch-message "Startup finished !")
+  ;; (setq initial-scratch-message "Startup finished !")
 
   ;;;;; Initial buffer
   (setq remember-notes-initial-major-mode 'org-mode)
@@ -258,8 +258,11 @@ Auto-format source code in many languages with one command
 
 *** [[https://github.com/lewang/flx][flx]]
     #+BEGIN_SRC emacs-lisp
-    (use-package flx)
-    (setq ivy-initial-inputs-alist nil)
+      (use-package flx
+        :ensure t
+        :config
+        (setq ivy-initial-inputs-alist nil)
+        )
     #+END_SRC
 *** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
     Emacs package that displays available keybindings in popup
@@ -421,7 +424,7 @@ Auto-format source code in many languages with one command
           (bookmarks . 5)
           (projects . 5)
           (agenda . 5)
-          (registers . 5)
+          ;; (registers . 5)
       ))
 
       (setq dashboard-banner-logo-title "Happy hacking.")				;; Set the title
@@ -481,11 +484,6 @@ Auto-format source code in many languages with one command
       (use-package base16-theme :ensure t :defer t)
       (load-theme 'gruvbox-dark-hard t)
 
-
-    #+END_SRC
-
-    #+BEGIN_SRC emacs-lisp :tangle yes
-
       (defun check-expansion ()
         (save-excursion
           (if (looking-at "\\_>") t
@@ -524,27 +522,41 @@ Auto-format source code in many languages with one command
       (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
     #+END_SRC
 
+
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+    (progn
+      (setq beacon-blink-when-point-moves-vertically nil) ; default nil
+      (setq beacon-blink-when-point-moves-horizontally nil) ; default nil
+      (setq beacon-blink-when-buffer-changes t) ; default t
+      (setq beacon-blink-when-window-scrolls t) ; default t
+      (setq beacon-blink-when-window-changes t) ; default t
+      (setq beacon-blink-when-focused nil) ; default nil
+
+      (setq beacon-blink-duration 0.3) ; default 0.3
+      (setq beacon-blink-delay 0.3) ; default 0.3
+      (setq beacon-size 20) ; default 40
+      ;; (setq beacon-color "yellow") ; default 0.5
+      (setq beacon-color 0.5) ; default 0.5
+
+      (add-to-list 'beacon-dont-blink-major-modes 'term-mode)
+
+      (beacon-mode 1)))
+#+END_SRC
+
 * TODO
-** packages missing from use-package
-*** DONE counsel
-*** DONE general.el
 ** Packaes I want to add/look into
-*** TODO projectile
-**** DONE install
-**** TODO figure out how it works
-*** TODO magit
-**** DONE install
-**** TODO figure out how it works
-*** DONE use-package
-*** DONE evil-leader (Dont need it for now)
 *** TODO evil-textobj-between.el
-*** TODO flx https://oremacs.com/2016/01/06/ivy-flx/
 ** Stuff that doesn't work yet
 *** Show yasnippets' snippets in company completion when typing
 ** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
 *** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
-*** DONE Make package titles in this doc to links to the gitbhub repos
 *** TODO A shortcut to edit my init file (a literate init file with Org mode, which is great).
 *** TODO One key departure from Spacemacs: adding special modes like dired and VC to the evil-emacs-state-map, so that it uses the (usually consistent and mnemonic) default key bindings for those modes instead of mixing with Evil unpredictably.
 *** TODO Using a mnemonic key mapping, e.g. keeping VC commands under leader-v and shell commands under leader-s.
 *** TODO reference Spacemacs to get ideas for language-specific packages to install.
+
+
+k
