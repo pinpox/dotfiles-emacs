@@ -257,6 +257,11 @@ Auto-format source code in many languages with one command
         '((t   . ivy--regex-fuzzy))))							;; configure regexp engine to use fuzzy finding
     #+END_SRC
 
+*** [[https://github.com/lewang/flx][flx]]
+    #+BEGIN_SRC emacs-lisp
+    (use-package flx)
+    (setq ivy-initial-inputs-alist nil)
+    #+END_SRC
 *** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
     Emacs package that displays available keybindings in popup
     #+BEGIN_SRC emacs-lisp
