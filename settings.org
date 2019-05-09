@@ -10,16 +10,6 @@
           `(("." . ,(concat user-emacs-directory "emacs-backups"))))
   #+END_SRC
 
-* Appearance
-  Removes the menu,tool and scrollbars along with the splash-screen.
-
-  #+BEGIN_SRC emacs-lisp
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (setq inhibit-splash-screen t)
-  #+END_SRC
-
 * General Options
   Enable relative line numbers, disable the creation of file-backups when editing.
   #+BEGIN_SRC emacs-lisp
@@ -71,7 +61,7 @@
 
   ;; =scroll-conservatively= is still 0, but the low values of
   ;; =scroll-(up|down)-aggressively= ensure the smooth scrolling.
-  (setq-default scroll-margin 3
+  (setq-default scroll-margin 5
           scroll-conservatively 0
           scroll-up-aggressively 0.01
           scroll-down-aggressively 0.01)
@@ -90,9 +80,13 @@
   (setq remember-data-file "~/org/notes.org")
   ;; (setq initial-buffer-choice 'remember-notes)
 
+      (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
+** Appearance
+
 * Installed Packages
+** Evil
   The extensible vi layer for Emacs.
 *** [[https://github.com/emacs-evil/evil][evil-mode]]
     #+BEGIN_SRC emacs-lisp
@@ -151,89 +145,43 @@
         (evil-commentary-mode))
     #+END_SRC
 
-*** [[https://github.com/company-mode/company-mode][company-mode]]
-    Modular in-buffer completion framework for Emacs
-    #+BEGIN_SRC emacs-lisp
-      (use-package company
-        :demand
-        :config (progn
-                  (add-hook 'prog-mode-hook #'(lambda () (company-mode)))
-                  (setq company-show-numbers t))
-        (add-hook 'after-init-hook 'global-company-mode))
-    #+END_SRC
 
-*** [[https://github.com/joaotavora/yasnippet][yasnippet]]
-    A template system for Emacs
-    #+BEGIN_SRC emacs-lisp
-      (use-package yasnippet
-        :ensure t
-        :init
-        (yas-global-mode 1))
-      (defvar company-mode/enable-yas t
-        "Enable yasnippet for all backends.")
-
-      (defun company-mode/backend-with-yas (backend)
-        (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-            backend
-          (append (if (consp backend) backend (list backend))
-                  '(:with company-yasnippet))))
-      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-    #+END_SRC
-
-*** [[https://github.com/sabof/org-bullets][org-bullets]]
-    Make the bullets in org-mode look nicer with UTF-8 characters
-    #+BEGIN_SRC emacs-lisp
-    (use-package org-bullets
-      :demand
-      :config
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-    #+END_SRC
-
-*** [[https://github.com/flycheck/flycheck][flycheck]]
-    On the fly syntax checking
-    #+BEGIN_SRC emacs-lisp
-    (use-package flycheck
-      :ensure t
-      :init (global-flycheck-mode))
-    #+END_SRC
-
-*** [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]]
-    LSP support
-    #+BEGIN_SRC emacs-lisp
-    (use-package lsp-mode
-      :commands lsp
-      :init
-											;; (setq ...)
-    )
-    (add-hook 'after-init-hook #'global-flycheck-mode)
-    #+END_SRC
-
+** LSP
 *** [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]]
     This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
-    #+BEGIN_SRC emacs-lisp
-    (use-package lsp-ui
-      :config
-      (setq lsp-ui-sideline-enable t
-        lsp-ui-doc-enable nil
-        lsp-ui-flycheck-enable t
-        lsp-ui-imenu-enable t
-        lsp-ui-sideline-ignore-duplicate t))
-    (provide 'setup-lsp)
-    #+END_SRC
-
 *** [[https://github.com/tigersoldier/company-lsp][company-lsp]]
-    #+BEGIN_SRC emacs-lisp
-    (use-package company-lsp :commands company-lsp)
-    (push 'company-lsp company-backends)
-    #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+       (use-package lsp-mode
+         :ensure t
+         :init (setq lsp-inhibit-message t
+                     lsp-eldoc-render-all nil
+                     lsp-highlight-symbol-at-point nil))
 
-*** [[https://github.com/lassik/emacs-format-all-the-code][format-all]]
-Auto-format source code in many languages with one command
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package format-all
-      :ensure t)
-    #+END_SRC
 
+      (add-hook 'after-init-hook #'global-flycheck-mode)
+       (use-package company-lsp
+         :after  company
+         :ensure t
+         :config
+         (setq company-lsp-enable-snippet t
+               company-lsp-cache-candidates t))
+
+     ;; (push 'company-lsp company-backends)
+
+       (use-package lsp-ui
+         :ensure t
+         :config
+         (setq lsp-ui-sideline-enable t
+               lsp-ui-sideline-show-symbol t
+               lsp-ui-sideline-show-hover t
+               lsp-ui-flycheck-enable t
+               lsp-ui-imenu-enable t
+          ;; lsp-ui-doc-enable nil
+          ;; lsp-ui-sideline-ignore-duplicate t
+               lsp-ui-sideline-show-code-actions t
+               lsp-ui-sideline-update-mode 'point))
+
+   #+END_SRC
 *** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
     lsp-mode support for java
     #+BEGIN_SRC emacs-lisp
@@ -241,9 +189,75 @@ Auto-format source code in many languages with one command
       :config (add-hook 'java-mode-hook 'lsp))
     #+END_SRC
 
+** Filetypes
+*** config-general-mode, general unix files
+    #+BEGIN_SRC emacs-lisp
+    (use-package config-general-mode
+    :ensure t
+    :mode ("\\.conf$" "\\.*rc$"))
+
+
+
+  (use-package ssh-config-mode
+    :ensure t
+    :mode ("/\\.ssh/config\\'" "/system/ssh\\'" "/sshd?_config\\'" "/known_hosts\\'" "/authorized_keys2?\\'")
+    :hook (ssh-config-mode . turn-on-font-lock)
+
+    :config
+    (autoload 'ssh-config-mode "ssh-config-mode" t))
+
+
+
+  (use-package logview
+    :ensure t
+    :mode ("syslog\\(?:\\.[0-9]+\\)" "\\.log\\(?:\\.[0-9]+\\)?\\'"))
+
+
+  (use-package yaml-mode
+    :ensure t
+    :mode (".yaml$"))
+
+  (use-package yaml-tomato
+    :ensure t)
+
+  (use-package vimrc-mode
+    :ensure t
+    :mode ("^\\.vimrc\\'"))
+    #+END_SRC
+
+
+
+*** graphviz
+    #+BEGIN_SRC emacs-lisp
+
+(use-package graphviz-dot-mode
+  :ensure t
+  :init
+  (defvar default-tab-width nil)
+
+  :mode ("\\.dot\\'"))
+
+    #+END_SRC
+
+
+
+** Completion and snippets
 *** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
     Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
     #+BEGIN_SRC emacs-lisp
+
+(use-package ivy
+  :ensure t
+  :config
+  (ivy-mode)
+  (setq ivy-display-style 'fancy
+        ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t
+        ivy-use-selectable-prompt t))
+
+
+
+
     (use-package counsel :ensure t
       :bind
       :config
@@ -254,6 +268,18 @@ Auto-format source code in many languages with one command
 											;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
       (setq ivy-re-builders-alist
         '((t   . ivy--regex-fuzzy))))							;; configure regexp engine to use fuzzy finding
+
+
+
+
+
+(setq counsel-find-file-ignore-regexp
+        (concat
+         ;; File names beginning with # or .
+         "\\(?:\\`[#.]\\)"
+         ;; File names ending with # or ~
+         "\\|\\(?:\\`.+?[#~]\\'\\)"))
+
     #+END_SRC
 
 *** [[https://github.com/lewang/flx][flx]]
@@ -264,56 +290,122 @@ Auto-format source code in many languages with one command
         (setq ivy-initial-inputs-alist nil)
         )
     #+END_SRC
-*** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
-    Emacs package that displays available keybindings in popup
+*** [[https://github.com/company-mode/company-mode][company-mode]]
+    Modular in-buffer completion framework for Emacs
     #+BEGIN_SRC emacs-lisp
-    (use-package which-key :demand)
-    (which-key-mode)
-    (which-key-enable-god-mode-support)
+
+      ;; (use-package company-go
+      ;;   :ensure t
+      ;;   :defer t
+      ;;   :init
+      ;;   (with-eval-after-load 'company
+      ;; (add-to-list 'company-backends 'company-go)))
+
+      (use-package company
+        :ensure t
+        :config
+        (progn
+          (setq company-idle-delay 0.3
+                company-dabberv-downcase 0
+                company-minimum-prefix-length 1
+                company-show-numbers t
+                company-tooltip-limit 20)
+          (company-tng-configure-default)
+          (define-key company-active-map [tab] nil)
+          (define-key company-active-map (kbd "TAB") nil)
+          )
+
+        ;; Facing
+        (unless (face-attribute 'company-tooltip :background)
+          (set-face-attribute 'company-tooltip nil :background "black" :foreground "gray40")
+          (set-face-attribute 'company-tooltip-selection nil :inherit 'company-tooltip :background "gray15")
+          (set-face-attribute 'company-preview nil :background "black")
+          (set-face-attribute 'company-preview-common nil :inherit 'company-preview :foreground "gray40")
+          (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
+          (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
+
+        ;; Activating globally
+        (global-company-mode t)
+
+
+
+        (use-package company-quickhelp
+          :ensure t
+          :after company
+          :config
+          (company-quickhelp-mode 1))
+
+        (use-package company-quickhelp          ; Documentation popups for Company
+          :ensure t
+          :defer t
+          :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode)
+          )
+          )
     #+END_SRC
 
-*** [[https://github.com/TheBB/spaceline][spaceline]]
-    Show a nicer mode-line
-    #+BEGIN_SRC emacs-lisp
-      (use-package spaceline
-	:ensure t
-	:init
-	(require 'spaceline-config)
-	(setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
-	(setq powerline-default-separator 'slant)
-	(setq evil-normal-state-tag "NORMAL")
-	(setq evil-insert-state-tag "INSERT")
-	(setq evil-visual-state-tag "VISUAL")
-	(setq evil-emacs-state-tag "EMACS")
-	:config
-	(progn
-	  (										;; spaceline-define-segment buffer-id
-											;;  ( if (buffer-file-name)
-											;;       (let ((project-root (projectile-project-p)))
-											;;         (if project-root
-											;;             (file-relative-name (buffer-file-name) project-root)
-											;;           (abbreviate-file-name (buffer-file-name))))
-											;;     (powerline-buffer-id)
-											;; 	)
-	    )
-	  (spaceline-spacemacs-theme)
-	  (spaceline-toggle-minor-modes-off)))
-    #+END_SRC
 
-*** [[https://github.com/dgutov/diff-hl][diff-hl]]
-    Show git diff gutter
+*** [[https://github.com/joaotavora/yasnippet][yasnippet]]
+    A template system for Emacs
     #+BEGIN_SRC emacs-lisp
-    (use-package diff-hl
-	:ensure t
-	:config
-	(global-diff-hl-mode +1)
-	(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-	(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+
+      (use-package yasnippet
+        :ensure t
+        :config
+        (progn
+
+          ;; (define-key yas-minor-mode-map (kbd "tab") #'yas-expand)
+
+          ;; Activate global
+          (yas-global-mode)))
+
+
+
+
+
+      (use-package yasnippet-snippets :ensure t)
+      (use-package ivy-yasnippet :ensure t)
+
+      (defvar company-mode/enable-yas t
+        "Enable yasnippet for all backends.")
+
+      (defun company-mode/backend-with-yas (backend)
+        (if
+            (or (not company-mode/enable-yas)
+                (and (listp backend) (member 'company-yasnippet backend))
+                )
+            backend
+          (append (if (consp backend) backend (list backend))
+                  '(:with company-yasnippet))))
+      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
     #+END_SRC
 
 
+** Org-Mode
+*** [[https://github.com/sabof/org-bullets][org-bullets]]
+    Make the bullets in org-mode look nicer with UTF-8 characters
+    #+BEGIN_SRC emacs-lisp
+    (use-package org-bullets
+      :demand
+      :config
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    #+END_SRC
 
+** Linting, spellcheck and reformatting
+*** [[https://github.com/flycheck/flycheck][flycheck]]
+    On the fly syntax checking
+    #+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+      :ensure t
+      :init (global-flycheck-mode))
+    #+END_SRC
+*** [[https://github.com/lassik/emacs-format-all-the-code][format-all]]
+Auto-format source code in many languages with one command
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package format-all
+      :ensure t)
+    #+END_SRC
 
+** Other tools
 *** [[https://github.com/politza/pdf-tools][pdf-tools]]
     #+BEGIN_SRC emacs-lisp :tangle yes
 
@@ -346,9 +438,78 @@ Auto-format source code in many languages with one command
         ;; )
       (use-package org-pdfview :ensure t))
     #+END_SRC
+
+*** magit
+    #+BEGIN_SRC emacs-lisp :tangle yes
+        (use-package magit
+          :ensure t
+          :defer t
+          ;; :bind (("C-x g" . magit-status))
+          ;; :config
+          ;; (progn
+      ;;       (defun inkel/magit-log-edit-mode-hook ()
+      ;;   (setq fill-column 72)
+      ;;   (flyspell-mode t)
+      ;;   (turn-on-auto-fill))
+      ;;       (add-hook 'magit-log-edit-mode-hook 'inkel/magit-log-edit-mode-hook)
+      ;;       (defadvice magit-status (around magit-fullscreen activate)
+      ;;   (window-configuration-to-register :magit-fullscreen)
+      ;;   ad-do-it
+      ;;   (delete-other-windows))
+      ;;
+      ;; )
+          )
+    #+END_SRC
+
+*** [[https://github.com/dgutov/diff-hl][diff-hl]]
+    Show git diff gutter
+    #+BEGIN_SRC emacs-lisp
+    (use-package diff-hl
+	:ensure t
+	:config
+	(global-diff-hl-mode +1)
+	(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+	(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+    #+END_SRC
+
+*** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
+    Emacs package that displays available keybindings in popup
+    #+BEGIN_SRC emacs-lisp
+    (use-package which-key :demand)
+    (which-key-mode)
+    #+END_SRC
+*** [[https://github.com/bbatsov/projectile][projectile]]
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package projectile
+        :bind-keymap
+        ;; ("C-c p" . projectile-command-map)
+        :config
+        (setq projectile-project-search-path '("~/Projects/" "~/Documents/" "~/org-files")))
+      (projectile-mode +1)
+    #+END_SRC
+*** [[https://github.com/ericdanan/counsel-projectile][counsel-projectile]]
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package counsel-projectile
+        :ensure t
+        :config
+        (counsel-projectile-mode))
+    #+END_SRC
+
+
+** Keybindings
 *** [[https://github.com/noctuid/general.el][general.el]]
     More convenient key definitions in emacs
     #+BEGIN_SRC emacs-lisp
+
+(defun kill-other-buffers ()
+    "Kill all other buffers."
+    (interactive)
+    (mapc 'kill-buffer
+          (delq (current-buffer)
+                (remove-if-not 'buffer-file-name (buffer-list)))))
+
+
+
       (use-package general
       :ensure t
       :init
@@ -394,12 +555,14 @@ Auto-format source code in many languages with one command
 
                         ;; Windows
          "w"	'(:ignore t :which-key "Window")
+         "wo" '(delete-other-windows :which-key "delete other windows")
          "wd"	'(delete-window :which-key "delete window")
          "ws"	'(split-window-right :which-key "split vertical")
          "wS"	'(split-window-below :which-key "split horizontal")
 
                         ;; Buffers TODO edit, eval..
          "b"	'(:ignore t :which-key "Buffer")
+         "bo" '(kill-other-buffers :which-key "Kill other buffers")
          "bd"	'(kill-buffer-and-window :which-key "kill buffer and window")
          "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
                         ;; Projects
@@ -411,6 +574,44 @@ Auto-format source code in many languages with one command
 
 
          ))
+    #+END_SRC
+
+** Appearance
+
+   Removes the menu,tool and scrollbars along with the splash-screen.
+
+   #+BEGIN_SRC emacs-lisp
+     (menu-bar-mode -1)
+     (tool-bar-mode -1)
+     (scroll-bar-mode -1)
+     (setq inhibit-splash-screen t)
+   #+END_SRC
+*** [[https://github.com/TheBB/spaceline][spaceline]]
+    Show a nicer mode-line
+    #+BEGIN_SRC emacs-lisp
+      (use-package spaceline
+	:ensure t
+	:init
+	(require 'spaceline-config)
+	(setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+	(setq powerline-default-separator 'slant)
+	(setq evil-normal-state-tag "NORMAL")
+	(setq evil-insert-state-tag "INSERT")
+	(setq evil-visual-state-tag "VISUAL")
+	(setq evil-emacs-state-tag "EMACS")
+	:config
+	(progn
+	  (										;; spaceline-define-segment buffer-id
+											;;  ( if (buffer-file-name)
+											;;       (let ((project-root (projectile-project-p)))
+											;;         (if project-root
+											;;             (file-relative-name (buffer-file-name) project-root)
+											;;           (abbreviate-file-name (buffer-file-name))))
+											;;     (powerline-buffer-id)
+											;; 	)
+	    )
+	  (spaceline-spacemacs-theme)
+	  (spaceline-toggle-minor-modes-off)))
     #+END_SRC
 *** [[https://github.com/emacs-dashboard/emacs-dashboard][emacs-dashbord]]
     Display a startup dashboard
@@ -432,131 +633,49 @@ Auto-format source code in many languages with one command
       (setq dashboard-center-content t)						;; Center content
       (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
     #+END_SRC
-
-*** [[https://github.com/bbatsov/projectile][projectile]]
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package projectile
-        :bind-keymap
-        ;; ("C-c p" . projectile-command-map)
-        :config
-        (setq projectile-project-search-path '("~/Projects/" "~/Documents/" "~/org-files")))
-      (projectile-mode +1)
-    #+END_SRC
-
-
-*** [[https://github.com/ericdanan/counsel-projectile][counsel-projectile]]
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package counsel-projectile
-        :ensure t
-        :config
-        (counsel-projectile-mode))
-    #+END_SRC
-*** magit
-
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package magit
-        :ensure t
-        :defer t
-        :bind (("C-x g" . magit-status))
-        ;; :config
-        ;; (progn
-    ;;       (defun inkel/magit-log-edit-mode-hook ()
-    ;;   (setq fill-column 72)
-    ;;   (flyspell-mode t)
-    ;;   (turn-on-auto-fill))
-    ;;       (add-hook 'magit-log-edit-mode-hook 'inkel/magit-log-edit-mode-hook)
-    ;;       (defadvice magit-status (around magit-fullscreen activate)
-    ;;   (window-configuration-to-register :magit-fullscreen)
-    ;;   ad-do-it
-    ;;   (delete-other-windows))
-    ;;
-    ;; )
-        )
-
-
-    #+END_SRC
-
-
 *** Themes
     Also install some themes. I load gruvbox per default and switch sometimes.
     #+BEGIN_SRC emacs-lisp
       (use-package gruvbox-theme :ensure t :defer t)
-      (use-package base16-theme :ensure t :defer t)
+      ;; (use-package base16-theme :ensure t :defer t)
       (load-theme 'gruvbox-dark-hard t)
 
-      (defun check-expansion ()
-        (save-excursion
-          (if (looking-at "\\_>") t
-            (backward-char 1)
-            (if (looking-at "\\.") t
-              (backward-char 1)
-              (if (looking-at "->") t nil)))))
+      ;; (defun check-expansion ()
+      ;;   (save-excursion
+      ;;     (if (looking-at "\\_>") t
+      ;;       (backward-char 1)
+      ;;       (if (looking-at "\\.") t
+      ;;         (backward-char 1)
+      ;;         (if (looking-at "->") t nil)))))
 
-      (defun do-yas-expand ()
-        (let ((yas/fallback-behavior 'return-nil))
-          (yas/expand)))
+      ;; (defun do-yas-expand ()
+      ;;   (let ((yas/fallback-behavior 'return-nil))
+      ;;     (yas/expand)))
 
-      (defun tab-indent-or-complete ()
-        (interactive)
-        (if (minibufferp)
-            (minibuffer-complete)
-          (if (or (not yas/minor-mode)
-                  (null (do-yas-expand)))
-              (if (check-expansion)
-                  (company-complete-common)
-                (indent-for-tab-command)))))
+      ;; (defun tab-indent-or-complete ()
+      ;;   (interactive)
+      ;;   (if (minibufferp)
+      ;;       (minibuffer-complete)
+      ;;     (if (or (not yas/minor-mode)
+      ;;             (null (do-yas-expand)))
+      ;;         (if (check-expansion)
+      ;;             (company-complete-common)
+      ;;           (indent-for-tab-command)))))
 
-      (global-set-key [tab] 'tab-indent-or-complete)
+      ;; (global-set-key [tab] 'tab-indent-or-complete)
 
-      ;; Add yasnippet support for all company backends
-      ;; https://github.com/syl20bnr/spacemacs/pull/179
-      (defvar company-mode/enable-yas t
-        "Enable yasnippet for all backends.")
-
-      (defun company-mode/backend-with-yas (backend)
-        (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-            backend
-          (append (if (consp backend) backend (list backend))
-                  '(:with company-yasnippet))))
-
-      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
     #+END_SRC
 
-
-#+BEGIN_SRC emacs-lisp
-  (use-package beacon
-    :ensure t
-    :config
-    (progn
-      (setq beacon-blink-when-point-moves-vertically nil) ; default nil
-      (setq beacon-blink-when-point-moves-horizontally nil) ; default nil
-      (setq beacon-blink-when-buffer-changes t) ; default t
-      (setq beacon-blink-when-window-scrolls t) ; default t
-      (setq beacon-blink-when-window-changes t) ; default t
-      (setq beacon-blink-when-focused nil) ; default nil
-
-      (setq beacon-blink-duration 0.3) ; default 0.3
-      (setq beacon-blink-delay 0.3) ; default 0.3
-      (setq beacon-size 20) ; default 40
-      ;; (setq beacon-color "yellow") ; default 0.5
-      (setq beacon-color 0.5) ; default 0.5
-
-      (add-to-list 'beacon-dont-blink-major-modes 'term-mode)
-
-      (beacon-mode 1)))
-#+END_SRC
 
 * TODO
 ** Packaes I want to add/look into
 *** TODO evil-textobj-between.el
-** Stuff that doesn't work yet
-*** Show yasnippets' snippets in company completion when typing
+*** TODO use global ensure
 ** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
 *** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
 *** TODO A shortcut to edit my init file (a literate init file with Org mode, which is great).
-*** TODO One key departure from Spacemacs: adding special modes like dired and VC to the evil-emacs-state-map, so that it uses the (usually consistent and mnemonic) default key bindings for those modes instead of mixing with Evil unpredictably.
-*** TODO Using a mnemonic key mapping, e.g. keeping VC commands under leader-v and shell commands under leader-s.
+*** TODO One key departure from Spacemacs:
+    adding special modes like dired and VC to the evil-emacs-state-map, so that
+    it uses the (usually consistent and mnemonic) default key bindings for those
+    modes instead of mixing with Evil unpredictably.
 *** TODO reference Spacemacs to get ideas for language-specific packages to install.
-
-
-k

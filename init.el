@@ -27,7 +27,7 @@
  '(evil-collection-setup-minibuffer t)
  '(package-selected-packages
    (quote
-    (flx beacon auctex dokuwiki-mode xml-rpc mediawiki evil-magit counsel-projectile apache-mode ox-wk org-pdfview pdf-tools latex-preview-pane format-all evil-collection yasnippet-snippets yasnippet-classic-snippets which-key use-package twilight-theme twilight-anti-bright-theme spaceline snazzy-theme projectile org-bullets magit lsp-ui lsp-java lenlen-theme ivy-hydra gruvbox-theme graphviz-dot-mode go-eldoc git-gutter general fzf flycheck evil-org evil-leader evil-commentary diff-hl dashboard cycle-themes counsel-tramp company-quickhelp company-lsp company-go ample-theme)))
+    (ivy-yasnippet flx beacon auctex dokuwiki-mode xml-rpc mediawiki evil-magit counsel-projectile apache-mode ox-wk org-pdfview pdf-tools latex-preview-pane format-all evil-collection yasnippet-snippets yasnippet-classic-snippets which-key use-package twilight-theme twilight-anti-bright-theme spaceline snazzy-theme projectile org-bullets magit lsp-ui lsp-java lenlen-theme ivy-hydra gruvbox-theme graphviz-dot-mode go-eldoc git-gutter general fzf flycheck evil-org evil-leader evil-commentary diff-hl dashboard cycle-themes counsel-tramp company-quickhelp company-lsp company-go ample-theme)))
  '(shell-escape-mode "-shell-escape"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -44,3 +44,50 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((dot . t))) ; this line activates dot
+
+;; (setq company-backends
+;;       '((company-files          ; files & directory
+;;          company-keywords       ; keywords
+;;          company-capf
+;;          company-yasnippet
+;;          )
+;;         (company-abbrev company-dabbrev)
+;;         ))
+
+;; (add-hook 'python-mode-hook
+;;           (lambda ()
+;;             (add-to-list (make-local-variable 'company-backends)
+;;                          'company-anaconda)))
+;; (dolist (hook '(js-mode-hook
+;;                 js2-mode-hook
+;;                 js3-mode-hook
+;;                 inferior-js-mode-hook
+;;                 ))
+;;   (add-hook hook
+;;             (lambda ()
+;;               (tern-mode t)
+
+;;               (add-to-list (make-local-variable 'company-backends)
+;;                            'company-tern)
+;;               )))
+
+;; ;;;_. company-mode support like auto-complete in web-mode
+
+;; ;; Enable CSS completion between <style>...</style>
+;; (defadvice company-css (before web-mode-set-up-ac-sources activate)
+;;   "Set CSS completion based on current language before running `company-css'."
+;;   (if (equal major-mode 'web-mode)
+;;       (let ((web-mode-cur-language (web-mode-language-at-pos)))
+;;         (if (string= web-mode-cur-language "css")
+;;             (unless css-mode (css-mode))))))
+
+;; ;; Enable JavaScript completion between <script>...</script> etc.
+;; (defadvice company-tern (before web-mode-set-up-ac-sources activate)
+;;   "Set `tern-mode' based on current language before running `company-tern'."
+;;   (if (equal major-mode 'web-mode)
+;;       (let ((web-mode-cur-language (web-mode-language-at-pos)))
+;;         (if (or (string= web-mode-cur-language "javascript")
+;;                (string= web-mode-cur-language "jsx"))
+;;             (unless tern-mode (tern-mode))
+;;           ;; (if tern-mode (tern-mode))
+;;           ))))
