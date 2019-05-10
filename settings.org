@@ -7,18 +7,25 @@
 
     (require 'use-package)
     (setq use-package-always-ensure t)
-
-)
   #+END_SRC
 
 * General Options
-  Backup behaviour
-  #+BEGIN_SRC emacs-lisp
-    (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "emacs-backups")))
-    ;; (setq make-backup-files nil)                           ;; Don't make backup files when editing
+  Start by setting some personal information. I use password-store as my
+  goto-password-manager, emacs supports it without plugins since version 26.
+
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (setq user-full-name "Pablo Ovelleiro Corral"
+          user-mail-address "pablo1@mailbox.org"
+          mail-host-address "mailbox.org"
+          mail-default-reply-to "pablo@mailbox.org")
+
+    (require 'auth-source-pass)
+    (auth-source-pass-enable)
   #+END_SRC
 
-  Use UTF-8 by default
+  Use UTF-8 by default. I don't see why utf-8 should not be used everywhere as
+  most systems support it.
+
   #+BEGIN_SRC emacs-lisp :tangle yes
     (prefer-coding-system        'utf-8)
     (set-language-environment    'utf-8)
@@ -27,61 +34,60 @@
     (set-selection-coding-system 'utf-8)
   #+END_SRC
 
-  Indentation and trailing whitespace
+  I like having backups of files, but littering every directory I work in is not
+  what I want. Put them all in a single directory.
+
+  #+BEGIN_SRC emacs-lisp
+    (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "emacs-backups"))))
+  #+END_SRC
+
+  Establish an indentation and whitespace standard I follow. Trailing whitespace
+  is deleted on saving, this might cause problems someday and break a file, but
+  I have yet to come across a case where it happens.
+
   #+BEGIN_SRC emacs-lisp :tangle yes
     (setq standard-indent 2)
     (setq-default tab-width 2)
     (setq-default indent-tabs-mode nil)
     (setq show-trailing-whitespace t)
+    (setq sentence-end-double-space nil)
+    (setq default-fill-column 80)
     (add-hook 'before-save-hook 'delete-trailing-whitespace)
   #+END_SRC
 
-    Personal information
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (setq user-full-name "Pablo Ovelleiro Corral"
-          user-mail-address "pablo1@mailbox.org")
-  #+END_SRC
+  Default scrolling settings confuse me, as I keep loosing the line on which the
+  point is. Setting the scroll margin higher scrolls "sooner" and gives a bit
+  more context.
 
-  Integrate pass for password-management
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    ;; (require 'auth-source-pass)
-    ;; (auth-source-pass-enable)
-  #+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;;;;; Scrolling
-  ;; Default behaviour when point goes off screen is to scroll until
-  ;; point is in the middle of the screen. This is hard to follow
-  ;; for me, so I change the settings so that emacs only scrolls
-  ;; line by line.
-
-  ;; =scroll-conservatively= is still 0, but the low values of
-  ;; =scroll-(up|down)-aggressively= ensure the smooth scrolling.
+#+BEGIN_SRC emacs-lisp
   (setq-default scroll-margin 5
           scroll-conservatively 0
           scroll-up-aggressively 0.01
           scroll-down-aggressively 0.01)
 
-  ;;;;; Sentences end with .
-  (setq sentence-end-double-space nil)
+#+END_SRC
 
-  ;;;;; Default fill column
-  (setq default-fill-column 80)
+  Asking for confirmation when closing an unsaved file seems like a good idea.
+  But entering 'y' or 'n' is enough
 
-  ;;;;; Initial startup message
-  ;; (setq initial-scratch-message "Startup finished !")
+#+BEGIN_SRC emacs-lisp
 
-  ;;;;; Initial buffer
-  (setq remember-notes-initial-major-mode 'org-mode)
-  (setq remember-data-file "~/org/notes.org")
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+Some settings to start with a notes org-mode file. I have disabled them for now
+as I like the rather useless but good-looking dashboard
+
+#+BEGIN_SRC emacs-lisp
+  ;; (setq remember-notes-initial-major-mode 'org-mode)
+  ;; (setq remember-data-file "~/org/notes.org")
   ;; (setq initial-buffer-choice 'remember-notes)
-
-      (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
 * Evil
- The extensible vi layer for Emacs.
+ The extensible vi layer for Emacs. As a vim-refugee I try to enable evil-mode
+ in as many places as I can.
+
 ** [[https://github.com/emacs-evil/evil][evil-mode]]
    #+BEGIN_SRC emacs-lisp
      (use-package evil
@@ -96,6 +102,7 @@
                            (define-key evil-motion-state-map (kbd ":") 'evil-repeat-find-char))) ;; I don't use this much, but map it for completeness
 
    #+END_SRC
+
 ** [[https://github.com/emacs-evil/evil-collection][evil-collection]]
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil-collection
@@ -107,6 +114,7 @@
        (setq evil-collection-mode-list (delete 'dired evil-collection-mode-list))
        (evil-collection-init))
    #+END_SRC
+
 ** [[https://github.com/Somelauw/evil-org-mode][evil-org]]
    Evil bindings for org-mode
    #+BEGIN_SRC emacs-lisp
@@ -462,7 +470,7 @@ Auto-format source code in many languages with one command
  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
    #+END_SRC
 
-** [[ahttps://github.com/justbur/emacs-which-key][which-key]]
+** [[https://github.com/justbur/emacs-which-key][which-key]]
    Emacs package that displays available keybindings in popup
    #+BEGIN_SRC emacs-lisp
    (use-package which-key :demand)
