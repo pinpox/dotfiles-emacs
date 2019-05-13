@@ -190,6 +190,23 @@ If TRAMP makes backup files, they should better be kept locally than remote.
        (evil-commentary-mode))
    #+END_SRC
 
+** [[https://github.com/cofi/evil-numbers][evil-numbers]]
+   #+BEGIN_SRC emacs-lisp
+        ;; (use-package evil-numbers
+     ;;    :ensure
+     ;; :config
+
+     ;;    (define-key evil-normal-state-map (kbd "C-A")
+     ;;   'evil-numbers/inc-at-pt)
+     ;; (define-key evil-normal-state-map (kbd "C-S-A")
+     ;;   'evil-numbers/dec-at-pt)
+     ;; )
+
+
+
+   #+END_SRC
+
+
 * LSP
 ** [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]]
    This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
