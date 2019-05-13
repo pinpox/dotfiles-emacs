@@ -54,11 +54,11 @@
 ** Package management and use-package
 
 
-Emacs becomes truly useful with its package manager and thousands of freely
-available packages from its wonderful community. Use-package is a utility
-library that lets us declaratively setup the packages we will be using.
+   Emacs becomes truly useful with its package manager and thousands of freely
+   available packages from its wonderful community. Use-package is a utility
+   library that lets us declaratively setup the packages we will be using.
 
-#+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
 
 (require 'package) (setq package-archives '(("org" . "http://orgmode.org/elpa/")
                          ("melpa" . "http://melpa.org/packages/")
@@ -68,7 +68,7 @@ library that lets us declaratively setup the packages we will be using.
 (setq package-enable-at-startup nil)
 (package-initialize)
 
-#+END_SRC
+   #+END_SRC
 ** Other behaviour
    Asking for confirmation when closing an unsaved file seems like a good idea.
    But entering 'y' or 'n' is enough
@@ -203,6 +203,19 @@ library that lets us declaratively setup the packages we will be using.
     (interactive)
     (cleanup-buffer-safe)
     (indent-region (point-min) (point-max)))
+   #+END_SRC
+
+
+   Another function I find useful: Kill all other buffers (except the current
+   one). I Bind this to a key in general, as I use it quite a lot.
+
+   #+BEGIN_SRC emacs-lisp
+     (defun kill-other-buffers ()
+       "Kill all other buffers."
+       (interactive)
+       (mapc 'kill-buffer
+             (delq (current-buffer)
+                   (remove-if-not 'buffer-file-name (buffer-list)))))
    #+END_SRC
 
 * Evil
@@ -686,19 +699,17 @@ library that lets us declaratively setup the packages we will be using.
    #+END_SRC
 
 * Keybindings
+  I really like the idea of a leader key for custom bindings. More generally
+  (pun intended) I like the =general.el= package a lot, as I can define them
+  without having to worry too much about replacing something that is already
+  bound to that key. I took a few ideas from spacemacs (namely using =SPC= for
+  my leader) and bind all keys to mnemonics that make sense to me. In
+  combination with which-key I find them easy to remember and instead of just
+  using spacemacs I can keep adding the ones I really need.
+
 ** [[https://github.com/noctuid/general.el][general.el]]
    More convenient key definitions in emacs
    #+BEGIN_SRC emacs-lisp
-
-     (defun kill-other-buffers ()
-       "Kill all other buffers."
-       (interactive)
-       (mapc 'kill-buffer
-             (delq (current-buffer)
-                   (remove-if-not 'buffer-file-name (buffer-list)))))
-
-
-
      (use-package general
        :ensure t
        :init
@@ -831,8 +842,8 @@ library that lets us declaratively setup the packages we will be using.
   #+END_SRC
 * Eshell
 
-A shamelessly copied snippet do make the emacs-shell look a bit nicer. Still
-have to get the line-numbers to disappear
+  A shamelessly copied snippet do make the emacs-shell look a bit nicer. Still
+  have to get the line-numbers to disappear
 
   #+BEGIN_SRC emacs-lisp
 (require 'cl)
