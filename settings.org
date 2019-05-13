@@ -762,7 +762,7 @@ library that lets us declaratively setup the packages we will be using.
         "bo" '(kill-other-buffers :which-key "Kill other buffers")
         "bd" '(kill-buffer-and-window :which-key "kill buffer and window")
         "TAB"  '(ivy-switch-buffer :which-key "switch buffer")
-        "b=" '(cleanup-buffer :which-key "Cleanup current buffer"
+        "b=" '(cleanup-buffer :which-key "Cleanup current buffer")
 
 
         ;; Projects
