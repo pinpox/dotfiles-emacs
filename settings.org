@@ -670,6 +670,7 @@ Auto-format source code in many languages with one command
          "w"	'(:ignore t :which-key "Window")
          "wo" '(delete-other-windows :which-key "delete other windows")
          "wd"	'(delete-window :which-key "delete window")
+         "wr" '(rotate-windows :which-key "rotate windows")
          "ws"	'(split-window-right :which-key "split vertical")
          "wS"	'(split-window-below :which-key "split horizontal")
 
