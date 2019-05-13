@@ -10,10 +10,13 @@
   #+END_SRC
 
 * General Options
-  Start by setting some personal information. I use password-store as my
-  goto-password-manager, emacs supports it without plugins since version 26.
 
-  #+BEGIN_SRC emacs-lisp :tangle yes
+** Personal information
+   Start by setting some personal information. It is used in tools like git when
+   creating commits. I use password-store as my goto-password-manager, emacs
+   supports it without plugins since version 26.
+
+   #+BEGIN_SRC emacs-lisp :tangle yes
     (setq user-full-name "Pablo Ovelleiro Corral"
           user-mail-address "pablo1@mailbox.org"
           mail-host-address "mailbox.org"
@@ -21,111 +24,192 @@
 
     (require 'auth-source-pass)
     (auth-source-pass-enable)
-  #+END_SRC
+   #+END_SRC
 
-  Use UTF-8 by default. I don't see why utf-8 should not be used everywhere as
-  most systems support it.
+   Memory Management. Let's allow more than 800 KiB cache before starting
+   garbage collection. Every time memory crosses a certain threshold, it garbage
+   collects. But the default value for this threshold is quite low by modern
+   standards. Another low threshold is hit when opening files with sizes that
+   are common nowadays and Emacs warns you about being wary of opening such a
+   large file. I increase that limit too. I have RAM to spare.
 
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (prefer-coding-system        'utf-8)
-    (set-language-environment    'utf-8)
-    (set-default-coding-systems  'utf-8)
-    (set-terminal-coding-system  'utf-8)
-    (set-selection-coding-system 'utf-8)
-  #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold 50000000)
+  (setq large-file-warning-threshold 100000000)
+   #+END_SRC
 
- Backup files are created on save in the same directory as the file and end in
-  ~. They can be numbered which makes most sense combined with a different save
-  location and automatic pruning. Autosave files are created between saves after
-  a sufficient timeout in the current directory for crash detection, they begin
-  and end with #. Let’s change their save location as well.
-  #+BEGIN_SRC emacs-lisp
-  (setq backup-directory-alist '((".*" . "~/.emacs.d/backup")))
-(setq version-control t)
-(setq delete-old-versions t)
-(setq auto-save-list-file-prefix "~/.emacs.d/autosave/")
-(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosave/" t)))
-  #+END_SRC
+** Default encoding (UTF-8)
+   Use UTF-8 by default. I don't see why utf-8 should not be used everywhere as
+   most systems support it.
 
-  Establish an indentation and whitespace standard I follow. Trailing whitespace
-  is deleted on saving, this might cause problems someday and break a file, but
-  I have yet to come across a case where it happens.
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (setq standard-indent 2)
-    (setq-default tab-width 2)
-    (setq-default indent-tabs-mode nil)
-    (setq show-trailing-whitespace t)
-    (setq sentence-end-double-space nil)
-    (setq default-fill-column 80)
-    (add-hook 'before-save-hook 'delete-trailing-whitespace)
-  #+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (prefer-coding-system        'utf-8)
+     (set-language-environment    'utf-8)
+     (set-default-coding-systems  'utf-8)
+     (set-terminal-coding-system  'utf-8)
+     (set-selection-coding-system 'utf-8)
+   #+END_SRC
 
-  Default scrolling settings confuse me, as I keep loosing the line on which the
-  point is. Setting the scroll margin higher scrolls "sooner" and gives a bit
-  more context.
-#+BEGIN_SRC emacs-lisp
-  (setq-default scroll-margin 5
-          scroll-conservatively 0
-          scroll-up-aggressively 0.01
-          scroll-down-aggressively 0.01)
-#+END_SRC
 
-  Asking for confirmation when closing an unsaved file seems like a good idea.
-  But entering 'y' or 'n' is enough
-#+BEGIN_SRC emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+** Package management and use-package
 
-Some settings to start with a notes org-mode file. I have disabled them for now
-as I like the rather useless but good-looking dashboard
+
+Emacs becomes truly useful with its package manager and thousands of freely
+available packages from its wonderful community. Use-package is a utility
+library that lets us declaratively setup the packages we will be using.
 
 #+BEGIN_SRC emacs-lisp
-  ;; (setq remember-notes-initial-major-mode 'org-mode)
-  ;; (setq remember-data-file "~/org/notes.org")
-  ;; (setq initial-buffer-choice 'remember-notes)
-  (let ((default-directory  "~/.emacs.d/lisp/"))
-  (normal-top-level-add-subdirs-to-load-path))
-#+END_SRC
 
-If you type part of keybind, Emacs will display this part in the echo area after
-a timeout. One second is a bit too long though for my taste.
-#+BEGIN_SRC emacs-lisp
- (setq echo-keystrokes 0.1)
-#+END_SRC
+(require 'package) (setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("melpa-stable" . "http://stable.melpa.org/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")))
 
-Memory Management. Let’s allow more than 800 KiB cache before starting garbage
-collection.
-#+BEGIN_SRC emacs-lisp
-(setq gc-cons-threshold 50000000)
-#+END_SRC
-
-Save clipboard data of other programs in the kill ring when possible
-#+BEGIN_SRC emacs-lisp
-(setq save-interprogram-paste-before-kill t)
-#+END_SRC
-
-I like starting in the same place in a file as I left it on the next visit
-#+BEGIN_SRC emacs-lisp
-(setq-default save-place t)
-(setq save-place-file "~/.emacs.d/saveplace")
-#+END_SRC
-
-
-If TRAMP makes backup files, they should better be kept locally than remote.
-#+BEGIN_SRC emacs-lisp
-(setq tramp-backup-directory-alist backup-directory-alist)
-
-(customize-set-variable 'tramp-default-method "ssh")
+(setq package-enable-at-startup nil)
+(package-initialize)
 
 #+END_SRC
+** Other behaviour
+   Asking for confirmation when closing an unsaved file seems like a good idea.
+   But entering 'y' or 'n' is enough
 
+   #+BEGIN_SRC emacs-lisp
+   (defalias 'yes-or-no-p 'y-or-n-p)
+   #+END_SRC
 
+   I like starting in the same place in a file as I left it on the next visit
+
+   #+BEGIN_SRC emacs-lisp
+  (setq-default save-place t)
+  (setq save-place-file "~/.emacs.d/saveplace")
+   #+END_SRC
+
+   If you type part of keybind, Emacs will display this part in the echo area after
+   a timeout. One second is a bit too long though for my taste.
+
+   #+BEGIN_SRC emacs-lisp
+   (setq echo-keystrokes 0.1)
+   #+END_SRC
+
+   Save clipboard data of other programs in the kill ring when possible
+
+   #+BEGIN_SRC emacs-lisp
+  (setq save-interprogram-paste-before-kill t)
+   #+END_SRC
+
+   Some settings to start with a notes org-mode file. I have disabled them for now
+   as I like the rather useless but good-looking dashboard
+
+   #+BEGIN_SRC emacs-lisp
+    ;; (setq remember-notes-initial-major-mode 'org-mode)
+    ;; (setq remember-data-file "~/org/notes.org")
+    ;; (setq initial-buffer-choice 'remember-notes)
+   #+END_SRC
+
+** Load additional functions
+
+   I have acumulated a few custom functions and little helpers over time. Some I
+   just want to test for a while or don't consider them important enough to add
+   theme here. Load them now to be able to bind them later.
+
+   #+BEGIN_SRC emacs-lisp
+   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
+   (let ((default-directory  "~/.emacs.d/lisp/"))
+     (normal-top-level-add-subdirs-to-load-path))
+     (require 'custom-functions)
+   #+END_SRC
+
+** Backups
+   Backup files are created on save in the same directory as the file and end in
+   ~. They can be numbered which makes most sense combined with a different save
+   location and automatic pruning. Autosave files are created between saves after
+   a sufficient timeout in the current directory for crash detection, they begin
+   and end with #. Let’s change their save location as well.
+   #+BEGIN_SRC emacs-lisp
+   (setq backup-directory-alist '((".*" . "~/.emacs.d/backup")))
+ (setq version-control t)
+ (setq delete-old-versions t)
+ (setq auto-save-list-file-prefix "~/.emacs.d/autosave/")
+ (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosave/" t)))
+   #+END_SRC
+
+** Indentation and whitespace
+   Establish an indentation and whitespace standard I follow. Trailing whitespace
+   is deleted on saving, this might cause problems someday and break a file, but
+   I have yet to come across a case where it happens.
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (setq standard-indent 2)
+     (setq-default tab-width 2)
+     (setq-default indent-tabs-mode nil)
+     (setq show-trailing-whitespace t)
+     (setq sentence-end-double-space nil)
+     (setq default-fill-column 80)
+     (add-hook 'before-save-hook 'delete-trailing-whitespace)
+   #+END_SRC
+
+** Scrolling
+   Default scrolling settings confuse me, as I keep loosing the line on which the
+   point is. Setting the scroll margin higher scrolls "sooner" and gives a bit
+   more context.
+   #+BEGIN_SRC emacs-lisp
+   (setq-default scroll-margin 5
+           scroll-conservatively 0
+           scroll-up-aggressively 0.01
+           scroll-down-aggressively 0.01)
+   #+END_SRC
+
+** Remote editing
+   If TRAMP makes backup files, they should better be kept locally than remote.
+   Also setting the default tramp method to =ssh= has solved some problems for
+   me on specific servers.
+   #+BEGIN_SRC emacs-lisp
+ (setq tramp-backup-directory-alist backup-directory-alist)
+ (customize-set-variable 'tramp-default-method "ssh")
+   #+END_SRC
+
+** Buffers
+   Auto revert mode looks for changes to files and updates them for you. With
+   these settings, dired buffers are also updated. The last setting makes sure
+   that you're not alerted every time this happens. Which is every time you
+   save something.
+
+   #+BEGIN_SRC emacs-lisp
+     (global-auto-revert-mode 1)
+     (setq global-auto-revert-non-file-buffers t)
+     (setq auto-revert-verbose nil)
+   #+END_SRC
+
+   Small convenience functions to clean up the current buffer. The first one
+   removes trailing whitespace and replaces all tabs with spaces before save.
+   The last one I've got on a key bound further down in geleral.el - it also
+   indents the entire buffer.
+
+   #+BEGIN_SRC emacs-lisp
+  (defun cleanup-buffer-safe ()
+    "Perform a bunch of safe operations on the whitespace content of a buffer.
+  Does not indent buffer, because it is used for a before-save-hook, and that
+  might be bad."
+    (interactive)
+    (untabify (point-min) (point-max))
+    (delete-trailing-whitespace)
+    (set-buffer-file-coding-system 'utf-8))
+
+  ;; Various superfluous white-space. Just say no.
+  (add-hook 'before-save-hook 'cleanup-buffer-safe)
+
+  (defun cleanup-buffer ()
+    "Perform a bunch of operations on the whitespace content of a buffer.
+  Including indent-buffer, which should not be called automatically on save."
+    (interactive)
+    (cleanup-buffer-safe)
+    (indent-region (point-min) (point-max)))
+   #+END_SRC
 
 * Evil
 
 
- The extensible vi layer for Emacs. As a vim-refugee I try to enable evil-mode
- in as many places as I can.
+  The extensible vi layer for Emacs. As a vim-refugee I try to enable evil-mode
+  in as many places as I can.
 
 ** [[https://github.com/emacs-evil/evil][evil-mode]]
    #+BEGIN_SRC emacs-lisp
@@ -211,7 +295,7 @@ If TRAMP makes backup files, they should better be kept locally than remote.
 ** [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]]
    This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
 ** [[https://github.com/tigersoldier/company-lsp][company-lsp]]
-  #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
       (use-package lsp-mode
         :ensure t
         :init (setq lsp-inhibit-message t
@@ -242,7 +326,7 @@ If TRAMP makes backup files, they should better be kept locally than remote.
               lsp-ui-sideline-show-code-actions t
               lsp-ui-sideline-update-mode 'point))
 
-  #+END_SRC
+   #+END_SRC
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
    lsp-mode support for java
    #+BEGIN_SRC emacs-lisp
@@ -289,7 +373,7 @@ If TRAMP makes backup files, they should better be kept locally than remote.
 
 
 ** graphviz
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
 
 (use-package graphviz-dot-mode
   :ensure t
@@ -298,12 +382,12 @@ If TRAMP makes backup files, they should better be kept locally than remote.
 
   :mode ("\\.dot\\'"))
 
-    #+END_SRC
+   #+END_SRC
 
 
 ** Latex Export
 
-#+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
 ;; Include the latex-exporter
 (require 'ox-latex)
 ;; Add minted to the defaults packages to include when exporting.
@@ -320,14 +404,14 @@ If TRAMP makes backup files, they should better be kept locally than remote.
 (setq org-latex-minted-options
 '(("frame" "lines") ("breaklines" "true")  ("frame" "single") ))
 
-#+END_SRC
+   #+END_SRC
 
 
 
 * Completion and snippets
 ** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
-    Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
-    #+BEGIN_SRC emacs-lisp
+   Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
+   #+BEGIN_SRC emacs-lisp
 
 (use-package ivy
   :ensure t
@@ -345,12 +429,12 @@ If TRAMP makes backup files, they should better be kept locally than remote.
       :bind
       :config
       (ivy-mode 1)
-      (setq ivy-use-virtual-buffers t)							;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
-      (setq ivy-height 10)								;; number of result lines to display
-      (setq ivy-count-format "%d/%d ")							;; set a default count format
-											;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
+      (setq ivy-use-virtual-buffers t)              ;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
+      (setq ivy-height 10)                ;; number of result lines to display
+      (setq ivy-count-format "%d/%d ")              ;; set a default count format
+                      ;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
       (setq ivy-re-builders-alist
-        '((t   . ivy--regex-fuzzy))))							;; configure regexp engine to use fuzzy finding
+        '((t   . ivy--regex-fuzzy))))             ;; configure regexp engine to use fuzzy finding
 
 
 
@@ -363,7 +447,7 @@ If TRAMP makes backup files, they should better be kept locally than remote.
          ;; File names ending with # or ~
          "\\|\\(?:\\`.+?[#~]\\'\\)"))
 
-    #+END_SRC
+   #+END_SRC
 
 ** [[https://github.com/lewang/flx][flx]]
    #+BEGIN_SRC emacs-lisp
@@ -501,11 +585,11 @@ If TRAMP makes backup files, they should better be kept locally than remote.
      :init (global-flycheck-mode))
    #+END_SRC
 ** [[https://github.com/lassik/emacs-format-all-the-code][format-all]]
-Auto-format source code in many languages with one command
-    #+BEGIN_SRC emacs-lisp :tangle yes
+   Auto-format source code in many languages with one command
+   #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package format-all
       :ensure t)
-    #+END_SRC
+   #+END_SRC
 
 * Other tools
   #+BEGIN_SRC emacs-lisp
@@ -603,214 +687,94 @@ Auto-format source code in many languages with one command
 
 * Keybindings
 ** [[https://github.com/noctuid/general.el][general.el]]
-    More convenient key definitions in emacs
-    #+BEGIN_SRC emacs-lisp
+   More convenient key definitions in emacs
+   #+BEGIN_SRC emacs-lisp
 
-      (defun kill-other-buffers ()
-        "Kill all other buffers."
-        (interactive)
-        (mapc 'kill-buffer
-              (delq (current-buffer)
-                    (remove-if-not 'buffer-file-name (buffer-list)))))
-
-
-
-      (use-package general
-        :ensure t
-        :init
-        (setq general-override-states '(insert
-                                        emacs
-                                        hybrid
-                                        normal
-                                        visual
-                                        motion
-                                        operator
-                                        replace))
-
-
-        :config
-        (general-define-key
-         :states '(normal visual insert emacs motion)
-         :keymaps 'override
-         :prefix "SPC"
-         :non-normal-prefix "M-SPC"
-         ;; General stuff
-         "SPC"	'(counsel-M-x :which-key "M-x")
-         "ESC"	'keyboard-quit
-         "/"	'(counsel-ag :wich-key "ag")
-         "."	'(avy-goto-word-or-subword-1  :which-key "go to word")
-         ;; "a"	'(hydra-launcher/body :which-key "Applications")
-         "c"	'(:ignore t :which-key "comment")
-         "cl"	'(comment-or-uncomment-region-or-line :which-key "comment line")
-         ;; "w"	'(hydra-window/body :which-key "Window")
-
-         ;; Files
-         "f"	'(:ignore t :which-key "files")
-         "fd"	'(counsel-git :which-key "find in git dir")
-         "ff"	'(counsel-find-file :which-key "open file")
-         "fr"	'(counsel-recentf :which-key "recent-files")
-         ;; Configs
-         "fc"	'(:ignore t :which-key "Config")
-         "fc"	'(:ignore t :which-key "Config")
-
-         ;; "fce"	'(:ignore t :which-key "Config") TODO edit emacs settings org
-
-         ;; Applicartions
-         "a"	'(:ignore t :which-key "Applications")
-         "g"	'(:ignore t :which-key "Git")
-         "gs" '(magit-status :which-key "Git status")
-
-
-         ;; Org
-         "o"	'(:ignore t :which-key "Org")
-         "ol" '(org-toggle-link-display :which-key "Toggle link visibility")
-         "ov" '(visible-mode :which-key "Toggle visibility")
-
-         ;; Windows
-         "w"	'(:ignore t :which-key "Window")
-         "wo" '(delete-other-windows :which-key "delete other windows")
-         "wd"	'(delete-window :which-key "delete window")
-         "ws"	'(split-window-right :which-key "split vertical")
-         "wS"	'(split-window-below :which-key "split horizontal")
-
-         ;; Buffers TODO edit, eval..
-         "b"	'(:ignore t :which-key "Buffer")
-         "bo" '(kill-other-buffers :which-key "Kill other buffers")
-         "bd"	'(kill-buffer-and-window :which-key "kill buffer and window")
-         "TAB"	'(ivy-switch-buffer :which-key "switch buffer")
-
-         ;; Projects
-         "p" '(:ignore t :which-key "Project")
-         "pp" '(counsel-projectile :which-key "Switch project")
-         "pf" '(counsel-projectile-find-file :which-key "Project file")
-         "p/" '(counsel-projectile-ag :which-key "Search project")
+     (defun kill-other-buffers ()
+       "Kill all other buffers."
+       (interactive)
+       (mapc 'kill-buffer
+             (delq (current-buffer)
+                   (remove-if-not 'buffer-file-name (buffer-list)))))
 
 
 
-         ;; Ever open a file in the wrong window?
-
-         ;; (defun rotate-windows ()
-         ;;   "Rotate your windows"
-         ;;   (interactive)
-         ;;   (cond ((not (> (count-windows)1))
-         ;;          (message "You can't rotate a single window!"))
-         ;;         (t
-         ;;          (setq i 1)
-         ;;          (setq numWindows (count-windows))
-         ;;          (while  (< i numWindows)
-         ;;            (let* (
-         ;;                   (w1 (elt (window-list) i))
-         ;;                   (w2 (elt (window-list) (+ (% i numWindows) 1)))
-
-         ;;                   (b1 (window-buffer w1))
-         ;;                   (b2 (window-buffer w2))
-
-         ;;                   (s1 (window-start w1))
-         ;;                   (s2 (window-start w2))
-         ;;                   )
-         ;;              (set-window-buffer w1  b2)
-         ;;              (set-window-buffer w2 b1)
-         ;;              (set-window-start w1 s2)
-         ;;              (set-window-start w2 s1)
-         ;;              (setq i (1+ i)))))))
-
-         ;; This snippet flips a two-window frame, so that left is right, or up is down. It's sanity preserving if you've got a sliver of OCD.
-
-         ;; Annoyed when Emacs opens the window below instead at the side?
-         ;; This snippet toggles between horizontal and vertical layout of two windows.
-         ;; (defun toggle-window-split ()
-         ;;   (interactive)
-         ;;   (if (= (count-windows) 2)
-         ;;       (let* ((this-win-buffer (window-buffer))
-         ;;              (next-win-buffer (window-buffer (next-window)))
-         ;;              (this-win-edges (window-edges (selected-window)))
-         ;;              (next-win-edges (window-edges (next-window)))
-         ;;              (this-win-2nd (not (and (<= (car this-win-edges)
-         ;;                                          (car next-win-edges))
-         ;;                                      (<= (cadr this-win-edges)
-         ;;                                          (cadr next-win-edges)))))
-         ;;              (splitter
-         ;;               (if (= (car this-win-edges)
-         ;;                      (car (window-edges (next-window))))
-         ;;                   'split-window-horizontally
-         ;;                 'split-window-vertically)))
-         ;;         (delete-other-windows)
-         ;;         (let ((first-win (selected-window)))
-         ;;           (funcall splitter)
-         ;;           (if this-win-2nd (other-window 1))
-         ;;           (set-window-buffer (selected-window) this-win-buffer)
-         ;;           (set-window-buffer (next-window) next-win-buffer)
-         ;;           (select-window first-win)
-         ;;           (if this-win-2nd (other-window 1))))))
+     (use-package general
+       :ensure t
+       :init
+       (setq general-override-states '(insert
+                                       emacs
+                                       hybrid
+                                       normal
+                                       visual
+                                       motion
+                                       operator
+                                       replace))
 
 
+       :config
+       (general-define-key
+        :states '(normal visual insert emacs motion)
+        :keymaps 'override
+        :prefix "SPC"
+        :non-normal-prefix "M-SPC"
+        ;; General stuff
+        "SPC"  '(counsel-M-x :which-key "M-x")
+        "ESC"  'keyboard-quit
+        "/"  '(counsel-ag :wich-key "ag")
+        "."  '(avy-goto-word-or-subword-1  :which-key "go to word")
+        ;; "a" '(hydra-launcher/body :which-key "Applications")
+        "c"  '(:ignore t :which-key "comment")
+        "cl" '(comment-or-uncomment-region-or-line :which-key "comment line")
+        ;; "w" '(hydra-window/body :which-key "Window")
+
+        ;; Files
+        "f"  '(:ignore t :which-key "files")
+        "fd" '(counsel-git :which-key "find in git dir")
+        "ff" '(counsel-find-file :which-key "open file")
+        "fr" '(counsel-recentf :which-key "recent-files")
+        ;; Configs
+        "fc" '(:ignore t :which-key "Config")
+        "fc" '(:ignore t :which-key "Config")
+
+        ;; "fce" '(:ignore t :which-key "Config") TODO edit emacs settings org
+
+        ;; Applicartions
+        "a"  '(:ignore t :which-key "Applications")
+        "g"  '(:ignore t :which-key "Git")
+        "gs" '(magit-status :which-key "Git status")
 
 
+        ;; Org
+        "o"  '(:ignore t :which-key "Org")
+        "ol" '(org-toggle-link-display :which-key "Toggle link visibility")
+        "ov" '(visible-mode :which-key "Toggle visibility")
 
-         ;; (defun cleanup-buffer-safe ()
-         ;;   "Perform a bunch of safe operations on the whitespace content of a buffer.
-         ;; Does not indent buffer, because it is used for a before-save-hook, and that
-         ;; might be bad."
-         ;;   (interactive)
-         ;;   (untabify (point-min) (point-max))
-         ;;   (delete-trailing-whitespace)
-         ;;   (set-buffer-file-coding-system 'utf-8))
+        ;; Windows
+        "w"  '(:ignore t :which-key "Window")
+        "wo" '(delete-other-windows :which-key "delete other windows")
+        "wd" '(delete-window :which-key "delete window")
+        "ws" '(split-window-right :which-key "split vertical")
+        "wS" '(split-window-below :which-key "split horizontal")
 
-         ;; ;; Various superfluous white-space. Just say no.
-         ;; (add-hook 'before-save-hook 'cleanup-buffer-safe)
+        ;; Buffers TODO edit, eval..
+        "b"  '(:ignore t :which-key "Buffer")
+        "bo" '(kill-other-buffers :which-key "Kill other buffers")
+        "bd" '(kill-buffer-and-window :which-key "kill buffer and window")
+        "TAB"  '(ivy-switch-buffer :which-key "switch buffer")
+        "b=" '(cleanup-buffer :which-key "Cleanup current buffer"
 
-         ;; (defun cleanup-buffer ()
-         ;;   "Perform a bunch of operations on the whitespace content of a buffer.
-         ;; Including indent-buffer, which should not be called automatically on save."
-         ;;   (interactive)
-         ;;   (cleanup-buffer-safe)
-         ;;   (indent-region (point-min) (point-max)))
 
-         ;; (global-set-key (kbd "C-c n") 'cleanup-buffer)
-
-         ;; I use these two literally all the time. The first one removes trailing whitespace and replaces all tabs with spaces before save.
-
-         ;; The last one I've got on a key - it also indents the entire buffer.
+        ;; Projects
+        "p" '(:ignore t :which-key "Project")
+        "pp" '(counsel-projectile :which-key "Switch project")
+        "pf" '(counsel-projectile-find-file :which-key "Project file")
+        "p/" '(counsel-projectile-ag :which-key "Search project")
 
 
 
-
-
-         ;; C-d on an empty line in the shell terminates the process.
-
-         ;; (defun comint-delchar-or-eof-or-kill-buffer (arg)
-         ;;   (interactive "p")
-         ;;   (if (null (get-buffer-process (current-buffer)))
-         ;;       (kill-buffer)
-         ;;     (comint-delchar-or-maybe-eof arg)))
-
-         ;; (add-hook 'shell-mode-hook
-         ;;           (lambda ()
-         ;;             (define-key shell-mode-map
-         ;;               (kbd "C-d") 'comint-delchar-or-eof-or-kill-buffer)))
-
-         ;; With this snippet, another press of C-d will kill the buffer.
-
-         ;; It's pretty nice, since you then just tap C-d twice to get rid of the shell and go on about your merry way.
-
-
-         ;; ;; Auto refresh buffers
-         ;; (global-auto-revert-mode 1)
-
-         ;; ;; Also auto refresh dired, but be quiet about it
-         ;; (setq global-auto-revert-non-file-buffers t)
-         ;; (setq auto-revert-verbose nil)
-
-         ;; Auto revert mode looks for changes to files, and updates them for you.
-
-         ;; With these settings, dired buffers are also updated. The last
-         ;; setting makes sure that you're not alerted every time this happens.
-         ;; Which is every time you save something.
-
-
-
-         ))
-    #+END_SRC
+        ))
+   #+END_SRC
 * Work Tools
   Some services I'm forced to use and integrate into emacs.
 ** Wiki
@@ -832,151 +796,12 @@ Auto-format source code in many languages with one command
        (setq jiralib-url "https://desk.committance.com")
        )
    #+END_SRC
-* Appearance
-
-  Removes the menu,tool and scrollbars along with the splash-screen.
-
+* Spellcheck
   #+BEGIN_SRC emacs-lisp
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (setq inhibit-splash-screen t)
-
-    (global-hl-line-mode 1)                                ;; Highlight current line
-    (setq-default display-line-numbers 'relative           ;; Display relative line-numbers
-                  display-line-numbers-current-absolute t) ;; Show absolute line number for current line
-    (show-paren-mode 1)                                    ;; Show matching parenthesis
-    (setq show-paren-delay 0)                              ;; Show it immediately, don't delay
-  #+END_SRC
-** [[https://github.com/TheBB/spaceline][spaceline]]
-   Show a nicer mode-line
-   #+BEGIN_SRC emacs-lisp
-     (use-package spaceline
- :ensure t
- :init
- (require 'spaceline-config)
- (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
- (setq powerline-default-separator 'slant)
- (setq evil-normal-state-tag "NORMAL")
- (setq evil-insert-state-tag "INSERT")
- (setq evil-visual-state-tag "VISUAL")
- (setq evil-emacs-state-tag "EMACS")
- :config
- (progn
-	 (										;; spaceline-define-segment buffer-id
-										 ;;  ( if (buffer-file-name)
-										 ;;       (let ((project-root (projectile-project-p)))
-										 ;;         (if project-root
-										 ;;             (file-relative-name (buffer-file-name) project-root)
-										 ;;           (abbreviate-file-name (buffer-file-name))))
-										 ;;     (powerline-buffer-id)
-										 ;; 	)
-	   )
-	 (spaceline-spacemacs-theme)
-	 (spaceline-toggle-minor-modes-off)))
-   #+END_SRC
-** [[https://github.com/emacs-dashboard/emacs-dashboard][emacs-dashbord]]
-   Display a startup dashboard
-   #+BEGIN_SRC emacs-lisp
-       (use-package dashboard
-     :ensure t
-     :config
-     (dashboard-setup-startup-hook))
-     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-     (setq dashboard-items '((recents  . 5)
-         (bookmarks . 5)
-         (projects . 5)
-         (agenda . 5)
-         ;; (registers . 5)
-     ))
-
-     (setq dashboard-banner-logo-title "Happy hacking.")				;; Set the title
-     (setq dashboard-startup-banner "~/.emacs.d/pc.png")				;; Set the banner
-     (setq dashboard-center-content t)						;; Center content
-     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-   #+END_SRC
-
-** [[https://github.com/tarsius/hl-todo][hl-todo]]
-
-Minor mode for coloring TODO, NOTE, FIXME and many more keywords of
-that sort prevalent in comments and strings.
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package hl-todo
-  ;; :ensure t
-  ;; :config
-  ;;  ((setq hl-todo-keyword-faces '(("TODO" . hl-todo)
-  ;;                                 ("NOTE" . hl-todo)
-  ;;                                 ("HACK" . hl-todo)
-  ;;                                 ("FIXME" . hl-todo)
-  ;;                                 ("KLUDGE" . hl-todo)))
-
-
-
-  ;;   (with-eval-after-load 'hl-todo
-  ;;     (hl-todo-set-regexp))
-  ;;     (hl-todo-mode)
-#+END_SRC
-** Themes
-   Also install some themes. I load gruvbox per default and switch sometimes.
-   #+BEGIN_SRC emacs-lisp
-     (use-package gruvbox-theme :ensure t :defer t)
-     ;; (use-package base16-theme :ensure t :defer t)
-     (load-theme 'gruvbox-dark-hard t)
-
-     ;; (defun check-expansion ()
-     ;;   (save-excursion
-     ;;     (if (looking-at "\\_>") t
-     ;;       (backward-char 1)
-     ;;       (if (looking-at "\\.") t
-     ;;         (backward-char 1)
-     ;;         (if (looking-at "->") t nil)))))
-
-     ;; (defun do-yas-expand ()
-     ;;   (let ((yas/fallback-behavior 'return-nil))
-     ;;     (yas/expand)))
-
-     ;; (defun tab-indent-or-complete ()
-     ;;   (interactive)
-     ;;   (if (minibufferp)
-     ;;       (minibuffer-complete)
-     ;;     (if (or (not yas/minor-mode)
-     ;;             (null (do-yas-expand)))
-     ;;         (if (check-expansion)
-     ;;             (company-complete-common)
-     ;;           (indent-for-tab-command)))))
-
-     ;; (global-set-key [tab] 'tab-indent-or-complete)
-
-   #+END_SRC
-
-* TODO
-** Packaes I want to add/look into
-*** TODO evil-textobj-between.el
-*** TODO Add keybindings to jira-commands with general
-*** TODO use global ensure
-*** TODO password-store-el
-** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
-*** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
-*** TODO A shortcut to edit my init file (a literate init file with Org mode, which is great).
-*** TODO One key departure from Spacemacs:
-    adding special modes like dired and VC to the evil-emacs-state-map, so that
-    it uses the (usually consistent and mnemonic) default key bindings for those
-    modes instead of mixing with Evil unpredictably.
-*** TODO reference Spacemacs to get ideas for language-specific packages to install.
-
-
-* Spell0cke
-  #+BEGIN_SRC emacs-lisp
-
-
-
-;; This buffer is for text that is not saved, and for Lisp evaluation.
-;; To create a file, visit it with C-x C-f and enter text in its buffer.
 
 (when (executable-find "hunspell")
   (setq-default ispell-program-name "hunspell")
   (setq ispell-really-hunspell t))
-
 
 ;; easy spell check
 (global-set-key (kbd "<f8>") 'ispell-word)
@@ -988,9 +813,6 @@ that sort prevalent in comments and strings.
   (ispell-word)
   )
 (global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
-
-
-
 
 (eval-after-load "flyspell"
   '(progn
@@ -1006,12 +828,13 @@ that sort prevalent in comments and strings.
      ))
 (define-key flyspell-mode-map (kbd "C-<f8>") 'flyspell-goto-next-and-popup)
 
+  #+END_SRC
+* Eshell
 
+A shamelessly copied snippet do make the emacs-shell look a bit nicer. Still
+have to get the line-numbers to disappear
 
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
 (require 'cl)
 (require 'dash)
 (require 's)
@@ -1090,70 +913,136 @@ that sort prevalent in comments and strings.
 (setq eshell-prompt-function 'esh-prompt-func)
 (add-hook 'shell-mode-hook (lambda ()
                                                           (linum-mode -1)))
+  #+END_SRC
+* Appearance
 
-#+END_SRC
+  Removes the menu,tool and scrollbars along with the splash-screen.
 
-#+RESULTS:
-: esh-prompt-func
+  #+BEGIN_SRC emacs-lisp
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (setq inhibit-splash-screen t)
+
+    (global-hl-line-mode 1)                                ;; Highlight current line
+    (setq-default display-line-numbers 'relative           ;; Display relative line-numbers
+                  display-line-numbers-current-absolute t) ;; Show absolute line number for current line
+    (show-paren-mode 1)                                    ;; Show matching parenthesis
+    (setq show-paren-delay 0)                              ;; Show it immediately, don't delay
+  #+END_SRC
+** [[https://github.com/TheBB/spaceline][spaceline]]
+   Show a nicer mode-line
+   #+BEGIN_SRC emacs-lisp
+     (use-package spaceline
+ :ensure t
+ :init
+ (require 'spaceline-config)
+ (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+ (setq powerline-default-separator 'slant)
+ (setq evil-normal-state-tag "NORMAL")
+ (setq evil-insert-state-tag "INSERT")
+ (setq evil-visual-state-tag "VISUAL")
+ (setq evil-emacs-state-tag "EMACS")
+ :config
+ (progn
+   (                    ;; spaceline-define-segment buffer-id
+                     ;;  ( if (buffer-file-name)
+                     ;;       (let ((project-root (projectile-project-p)))
+                     ;;         (if project-root
+                     ;;             (file-relative-name (buffer-file-name) project-root)
+                     ;;           (abbreviate-file-name (buffer-file-name))))
+                     ;;     (powerline-buffer-id)
+                     ;;   )
+     )
+   (spaceline-spacemacs-theme)
+   (spaceline-toggle-minor-modes-off)))
+   #+END_SRC
+** [[https://github.com/emacs-dashboard/emacs-dashboard][emacs-dashbord]]
+   Display a startup dashboard
+   #+BEGIN_SRC emacs-lisp
+       (use-package dashboard
+     :ensure t
+     :config
+     (dashboard-setup-startup-hook))
+     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+     (setq dashboard-items '((recents  . 5)
+         (bookmarks . 5)
+         (projects . 5)
+         (agenda . 5)
+         ;; (registers . 5)
+     ))
+
+     (setq dashboard-banner-logo-title "Happy hacking.")        ;; Set the title
+     (setq dashboard-startup-banner "~/.emacs.d/pc.png")        ;; Set the banner
+     (setq dashboard-center-content t)            ;; Center content
+     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+   #+END_SRC
+
+** [[https://github.com/tarsius/hl-todo][hl-todo]]
+
+   Minor mode for coloring TODO, NOTE, FIXME and many more keywords of
+   that sort prevalent in comments and strings.
+   #+BEGIN_SRC emacs-lisp
+  ;; (use-package hl-todo
+  ;; :ensure t
+  ;; :config
+  ;;  ((setq hl-todo-keyword-faces '(("TODO" . hl-todo)
+  ;;                                 ("NOTE" . hl-todo)
+  ;;                                 ("HACK" . hl-todo)
+  ;;                                 ("FIXME" . hl-todo)
+  ;;                                 ("KLUDGE" . hl-todo)))
 
 
 
-# ;; This buffer is for text that is not saved, and for Lisp evaluation.
-# ;; To create a file, visit it with C-x C-f and enter text in its buffer.
+  ;;   (with-eval-after-load 'hl-todo
+  ;;     (hl-todo-set-regexp))
+  ;;     (hl-todo-mode)
+   #+END_SRC
+** Themes
+   Also install some themes. I load gruvbox per default and switch sometimes.
+   #+BEGIN_SRC emacs-lisp
+     (use-package gruvbox-theme :ensure t :defer t)
+     ;; (use-package base16-theme :ensure t :defer t)
+     (load-theme 'gruvbox-dark-hard t)
 
+     ;; (defun check-expansion ()
+     ;;   (save-excursion
+     ;;     (if (looking-at "\\_>") t
+     ;;       (backward-char 1)
+     ;;       (if (looking-at "\\.") t
+     ;;         (backward-char 1)
+     ;;         (if (looking-at "->") t nil)))))
 
-#     (defvar *echo-keys-last* nil "Last command processed by `echo-keys'.")
+     ;; (defun do-yas-expand ()
+     ;;   (let ((yas/fallback-behavior 'return-nil))
+     ;;     (yas/expand)))
 
-#     (defun echo-keys ()
-#       (interactive)
-#       (let ((deactivate-mark deactivate-mark))
-#        (when (this-command-keys)
-#          (with-current-buffer (get-buffer-create "*echo-key*")
-#            (goto-char (point-max))
-#            ;; self  self
-#            ;; self  other \n
-#            ;; other self  \n
-#            ;; other other \n
-#            (unless (and (eq 'self-insert-command *echo-keys-last*)
-#                         (eq 'self-insert-command this-command))
-#              (insert "\n"))
-#            (if (eql this-command 'self-insert-command)
-#                (let ((desc (key-description (this-command-keys))))
-#                  (if (= 1 (length desc))
-#                      (insert desc)
-#                      (insert " " desc " ")))
-#                (insert (key-description (this-command-keys))))
-#            (setf *echo-keys-last* this-command)
-#            (dolist (window (window-list))
-#              (when (eq (window-buffer window) (current-buffer))
-#                ;; We need to use both to get the effect.
-#                (set-window-point window (point))
-#                (end-of-buffer)))))))
+     ;; (defun tab-indent-or-complete ()
+     ;;   (interactive)
+     ;;   (if (minibufferp)
+     ;;       (minibuffer-complete)
+     ;;     (if (or (not yas/minor-mode)
+     ;;             (null (do-yas-expand)))
+     ;;         (if (check-expansion)
+     ;;             (company-complete-common)
+     ;;           (indent-for-tab-command)))))
 
-#     (defun toggle-echo-keys ()
-#       (interactive)
-#       (if (member 'echo-keys  pre-command-hook)
-#           (progn
-#             (remove-hook 'pre-command-hook 'echo-keys)
-#             (dolist (window (window-list))
-#               (when (eq (window-buffer window) (get-buffer "*echo-key*"))
-#                 (delete-window window))))
-#           (progn
-#             (add-hook    'pre-command-hook 'echo-keys)
-#             (delete-other-windows)
-#             (split-window nil (- (window-width) 32) t)
-#             (other-window 1)
-#             (switch-to-buffer (get-buffer-create "*echo-key*"))
-#             (set-window-dedicated-p (selected-window) t)
-#             (other-window 1))))
+     ;; (global-set-key [tab] 'tab-indent-or-complete)
 
+   #+END_SRC
 
-TODO bind swiper to /
-
-
-#+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
-  (let ((default-directory  "~/.emacs.d/lisp/"))
-    (normal-top-level-add-subdirs-to-load-path))
-
-#+END_SRC
+* TODO
+*** TODO bind swiper to /
+*** TODO evil-textobj-between.el
+*** TODO evil-numbers
+*** TODO Add keybindings to jira-commands with general
+*** TODO use global ensure
+*** TODO password-store-el
+** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
+*** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
+*** TODO A shortcut to edit my init file (a literate init file with Org mode, which is great).
+*** TODO One key departure from Spacemacs:
+    adding special modes like dired and VC to the evil-emacs-state-map, so that
+    it uses the (usually consistent and mnemonic) default key bindings for those
+    modes instead of mixing with Evil unpredictably.
+*** TODO reference Spacemacs to get ideas for language-specific packages to install.
