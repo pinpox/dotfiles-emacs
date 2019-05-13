@@ -1,14 +1,3 @@
-* Repositories
-  From here-on out =use-package= loads packages. We almost always want to =:ensure= packages are present.
-  #+BEGIN_SRC emacs-lisp
-    (unless (package-installed-p 'use-package)
-      (package-refresh-contents)
-      (package-install 'use-package))
-
-    (require 'use-package)
-    (setq use-package-always-ensure t)
-  #+END_SRC
-
 * General Options
 
 ** Personal information
@@ -53,22 +42,30 @@
 
 ** Package management and use-package
 
-
    Emacs becomes truly useful with its package manager and thousands of freely
    available packages from its wonderful community. Use-package is a utility
-   library that lets us declaratively setup the packages we will be using.
+   library that lets us declaratively setup the packages we will be using. From
+   here-on out =use-package= loads packages.
 
    #+BEGIN_SRC emacs-lisp
+      (require 'package)
+      (setq package-enable-at-startup nil)
+      (setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                               ("melpa" . "http://melpa.org/packages/")
+                               ("melpa-stable" . "http://stable.melpa.org/packages/")
+                               ("gnu" . "https://elpa.gnu.org/packages/")))
+      (package-initialize)
 
-(require 'package) (setq package-archives '(("org" . "http://orgmode.org/elpa/")
-                         ("melpa" . "http://melpa.org/packages/")
-                         ("melpa-stable" . "http://stable.melpa.org/packages/")
-                         ("gnu" . "https://elpa.gnu.org/packages/")))
+      (unless (package-installed-p 'use-package)
+        (package-refresh-contents)
+        (package-install 'use-package))
 
-(setq package-enable-at-startup nil)
-(package-initialize)
+      (eval-when-compile
+        (require 'use-package))
 
+     (setq use-package-always-ensure t)
    #+END_SRC
+
 ** Other behaviour
    Asking for confirmation when closing an unsaved file seems like a good idea.
    But entering 'y' or 'n' is enough
@@ -113,9 +110,8 @@
    theme here. Load them now to be able to bind them later.
 
    #+BEGIN_SRC emacs-lisp
-   ;; (add-to-list 'load-path "~/.emacs.d/lisp/")
-   (let ((default-directory  "~/.emacs.d/lisp/"))
-     (normal-top-level-add-subdirs-to-load-path))
+     (let ((default-directory  "~/.emacs.d/lisp/"))
+       (normal-top-level-add-subdirs-to-load-path))
      (require 'custom-functions)
    #+END_SRC
 
@@ -126,11 +122,11 @@
    a sufficient timeout in the current directory for crash detection, they begin
    and end with #. Let’s change their save location as well.
    #+BEGIN_SRC emacs-lisp
-   (setq backup-directory-alist '((".*" . "~/.emacs.d/backup")))
- (setq version-control t)
- (setq delete-old-versions t)
- (setq auto-save-list-file-prefix "~/.emacs.d/autosave/")
- (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/autosave/" t)))
+     (setq backup-directory-alist '((".*" . "~/.emacs.d/backup"))
+           version-control t
+           delete-old-versions t
+           auto-save-list-file-prefix "~/.emacs.d/autosave/"
+           auto-save-file-name-transforms '((".*" "~/.emacs.d/autosave/" t)))
    #+END_SRC
 
 ** Indentation and whitespace
@@ -138,12 +134,14 @@
    is deleted on saving, this might cause problems someday and break a file, but
    I have yet to come across a case where it happens.
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (setq standard-indent 2)
-     (setq-default tab-width 2)
-     (setq-default indent-tabs-mode nil)
-     (setq show-trailing-whitespace t)
-     (setq sentence-end-double-space nil)
-     (setq default-fill-column 80)
+     (setq-default tab-width 2
+                   indent-tabs-mode nil)
+
+     (setq standard-indent 2
+           show-trailing-whitespace t
+           sentence-end-double-space nil
+           default-fill-column 80)
+
      (add-hook 'before-save-hook 'delete-trailing-whitespace)
    #+END_SRC
 
@@ -152,19 +150,20 @@
    point is. Setting the scroll margin higher scrolls "sooner" and gives a bit
    more context.
    #+BEGIN_SRC emacs-lisp
-   (setq-default scroll-margin 5
-           scroll-conservatively 0
-           scroll-up-aggressively 0.01
-           scroll-down-aggressively 0.01)
+     (setq-default scroll-margin 5
+                   scroll-conservatively 0
+                   scroll-up-aggressively 0.01
+                   scroll-down-aggressively 0.01)
    #+END_SRC
 
 ** Remote editing
    If TRAMP makes backup files, they should better be kept locally than remote.
    Also setting the default tramp method to =ssh= has solved some problems for
    me on specific servers.
+
    #+BEGIN_SRC emacs-lisp
- (setq tramp-backup-directory-alist backup-directory-alist)
- (customize-set-variable 'tramp-default-method "ssh")
+     (setq tramp-backup-directory-alist backup-directory-alist)
+     (customize-set-variable 'tramp-default-method "ssh")
    #+END_SRC
 
 ** Buffers
@@ -175,8 +174,8 @@
 
    #+BEGIN_SRC emacs-lisp
      (global-auto-revert-mode 1)
-     (setq global-auto-revert-non-file-buffers t)
-     (setq auto-revert-verbose nil)
+     (setq global-auto-revert-non-file-buffers t
+           auto-revert-verbose nil)
    #+END_SRC
 
    Small convenience functions to clean up the current buffer. The first one
@@ -185,24 +184,24 @@
    indents the entire buffer.
 
    #+BEGIN_SRC emacs-lisp
-  (defun cleanup-buffer-safe ()
-    "Perform a bunch of safe operations on the whitespace content of a buffer.
-  Does not indent buffer, because it is used for a before-save-hook, and that
-  might be bad."
-    (interactive)
-    (untabify (point-min) (point-max))
-    (delete-trailing-whitespace)
-    (set-buffer-file-coding-system 'utf-8))
+     (defun cleanup-buffer-safe ()
+       "Perform a bunch of safe operations on the whitespace content of a buffer.
+     Does not indent buffer, because it is used for a before-save-hook, and that
+     might be bad."
+       (interactive)
+       (untabify (point-min) (point-max))
+       (delete-trailing-whitespace)
+       (set-buffer-file-coding-system 'utf-8))
 
-  ;; Various superfluous white-space. Just say no.
-  (add-hook 'before-save-hook 'cleanup-buffer-safe)
+     ;; Various superfluous white-space. Just say no.
+     (add-hook 'before-save-hook 'cleanup-buffer-safe)
 
-  (defun cleanup-buffer ()
-    "Perform a bunch of operations on the whitespace content of a buffer.
-  Including indent-buffer, which should not be called automatically on save."
-    (interactive)
-    (cleanup-buffer-safe)
-    (indent-region (point-min) (point-max)))
+     (defun cleanup-buffer ()
+       "Perform a bunch of operations on the whitespace content of a buffer.
+     Including indent-buffer, which should not be called automatically on save."
+       (interactive)
+       (cleanup-buffer-safe)
+       (indent-region (point-min) (point-max)))
    #+END_SRC
 
 
@@ -220,11 +219,15 @@
 
 * Evil
 
-
   The extensible vi layer for Emacs. As a vim-refugee I try to enable evil-mode
   in as many places as I can.
 
 ** [[https://github.com/emacs-evil/evil][evil-mode]]
+   Ensure the evil-mode package is installed. I don't do much configuration here
+   apart from remapping =:= and =;=. I never saw the point of having to press
+   =Shift= to enter commands, swiching this keys completely makes more sense to
+   me.
+
    #+BEGIN_SRC emacs-lisp
           (use-package evil
             :ensure t
@@ -244,6 +247,11 @@
    #+END_SRC
 
 ** [[https://github.com/emacs-evil/evil-collection][evil-collection]]
+
+   More evil-mode keybindings, more evil-mode, more evil. There are parts that
+   evil-mode doesn't cover on it's own like =help-mode= or =calendar=, this
+   makes evil's keybindings more consistent.
+
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil-collection
        :after evil
@@ -256,7 +264,9 @@
    #+END_SRC
 
 ** [[https://github.com/Somelauw/evil-org-mode][evil-org]]
-   Evil bindings for org-mode
+
+   I also want evil bindings for org-mode. Why shouldn't I?
+
    #+BEGIN_SRC emacs-lisp
      (use-package evil-org
        :ensure t
@@ -272,13 +282,19 @@
    #+END_SRC
 
 ** [[https://github.com/emacs-evil/evil-magit][evil-magit]]
+
    Evil keybingings for magit
+
    #+BEGIN_SRC emacs-lisp :tangle yes
          (use-package evil-magit)
    #+END_SRC
 
 ** [[https://github.com/linktohack/evil-commentary][evil-commentary]]
-   Toggle comments in evil-mode
+
+   Toggle comments in evil-mode. I used the similar vim-plugin for a long time,
+   so this is muscle-memory. No need to learn it from scratch, the keybindings
+   are the same.
+
    #+BEGIN_SRC emacs-lisp
      (use-package evil-commentary
        :after evil
@@ -288,6 +304,11 @@
    #+END_SRC
 
 ** [[https://github.com/cofi/evil-numbers][evil-numbers]]
+
+   Another vim-inspired package. I have disabled it for now, since what I really
+   want is something like [[https://github.com/triglav/vim-visual-increment][vim-visual-increment]]. One day I might implement that
+   functionality and submit a pull-request or create a fork of the package.
+
    #+BEGIN_SRC emacs-lisp
         ;; (use-package evil-numbers
      ;;    :ensure
@@ -298,54 +319,60 @@
      ;; (define-key evil-normal-state-map (kbd "C-S-A")
      ;;   'evil-numbers/dec-at-pt)
      ;; )
-
-
-
    #+END_SRC
 
 
-* LSP
-** [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]]
-   This contains all the higher level UI modules of lsp-mode, like flycheck support and code lenses.
-** [[https://github.com/tigersoldier/company-lsp][company-lsp]]
+
+* Language server protocol
+
+  Taken from the [[https://microsoft.github.io/language-server-protocol/][Official page for Language server]]: The idea behind the Language
+  Server Protocol (LSP) is to standardize the protocol for how such servers and
+  development tools communicate. This way, a single Language Server can be
+  re-used in multiple development tools, which in turn can support multiple
+  languages with minimal effort.
+
+  In emacs I use [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] together with [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]] (higher level UI modules) and
+  [[https://github.com/tigersoldier/company-lsp][company-lsp]] (integration for my autocompletion package)
+
    #+BEGIN_SRC emacs-lisp
-      (use-package lsp-mode
-        :ensure t
-        :init (setq lsp-inhibit-message t
-                    lsp-eldoc-render-all nil
-                    lsp-highlight-symbol-at-point nil))
+     (use-package lsp-mode
+       :ensure t
+       :init (setq lsp-inhibit-message t
+                   lsp-eldoc-render-all nil
+                   lsp-highlight-symbol-at-point nil))
 
 
      (add-hook 'after-init-hook #'global-flycheck-mode)
-      (use-package company-lsp
-        :after  company
-        :ensure t
-        :config
-        (setq company-lsp-enable-snippet t
-              company-lsp-cache-candidates t))
+     (use-package company-lsp
+       :after  company
+       :ensure t
+       :config
+       (setq company-lsp-enable-snippet t
+             company-lsp-cache-candidates t))
 
-    ;; (push 'company-lsp company-backends)
+     ;; (push 'company-lsp company-backends)
 
-      (use-package lsp-ui
-        :ensure t
-        :config
-        (setq lsp-ui-sideline-enable t
-              lsp-ui-sideline-show-symbol t
-              lsp-ui-sideline-show-hover t
-              lsp-ui-flycheck-enable t
-              lsp-ui-imenu-enable t
-         ;; lsp-ui-doc-enable nil
-         ;; lsp-ui-sideline-ignore-duplicate t
-              lsp-ui-sideline-show-code-actions t
-              lsp-ui-sideline-update-mode 'point))
-
+     (use-package lsp-ui
+       :ensure t
+       :config
+       (setq lsp-ui-sideline-enable t
+             lsp-ui-sideline-show-symbol t
+             lsp-ui-sideline-show-hover t
+             lsp-ui-flycheck-enable t
+             lsp-ui-imenu-enable t
+             ;; lsp-ui-doc-enable nil
+             ;; lsp-ui-sideline-ignore-duplicate t
+             lsp-ui-sideline-show-code-actions t
+             lsp-ui-sideline-update-mode 'point))
    #+END_SRC
+
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
    lsp-mode support for java
    #+BEGIN_SRC emacs-lisp
    (use-package lsp-java :ensure t :after lsp
      :config (add-hook 'java-mode-hook 'lsp))
    #+END_SRC
+
 
 * Filetypes
 ** config-general-mode, general unix files
@@ -354,22 +381,16 @@
    :ensure t
    :mode ("\\.conf$" "\\.*rc$"))
 
-
-
  (use-package ssh-config-mode
    :ensure t
    :mode ("/\\.ssh/config\\'" "/system/ssh\\'" "/sshd?_config\\'" "/known_hosts\\'" "/authorized_keys2?\\'")
    :hook (ssh-config-mode . turn-on-font-lock)
-
    :config
    (autoload 'ssh-config-mode "ssh-config-mode" t))
-
-
 
  (use-package logview
    :ensure t
    :mode ("syslog\\(?:\\.[0-9]+\\)" "\\.log\\(?:\\.[0-9]+\\)?\\'"))
-
 
  (use-package yaml-mode
    :ensure t
