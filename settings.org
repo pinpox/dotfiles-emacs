@@ -15,17 +15,19 @@
     (auth-source-pass-enable)
    #+END_SRC
 
-   Memory Management. Let's allow more than 800 KiB cache before starting
-   garbage collection. Every time memory crosses a certain threshold, it garbage
-   collects. But the default value for this threshold is quite low by modern
-   standards. Another low threshold is hit when opening files with sizes that
-   are common nowadays and Emacs warns you about being wary of opening such a
-   large file. I increase that limit too. I have RAM to spare.
+** Memory Management
 
-   #+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 50000000)
-  (setq large-file-warning-threshold 100000000)
-   #+END_SRC
+    Let's allow more than 800 KiB cache before starting garbage collection. Every
+    time memory crosses a certain threshold, it garbage collects. But the
+    default value for this threshold is quite low by modern standards. Another
+    low threshold is hit when opening files with sizes that are common nowadays
+    and Emacs warns you about being wary of opening such a large file. I
+    increase that limit too. I have RAM to spare.
+
+    #+BEGIN_SRC emacs-lisp
+   (setq gc-cons-threshold 50000000)
+   (setq large-file-warning-threshold 100000000)
+    #+END_SRC
 
 ** Default encoding (UTF-8)
    Use UTF-8 by default. I don't see why utf-8 should not be used everywhere as
@@ -39,7 +41,6 @@
      (set-selection-coding-system 'utf-8)
    #+END_SRC
 
-
 ** Package management and use-package
 
    Emacs becomes truly useful with its package manager and thousands of freely
@@ -48,20 +49,20 @@
    here-on out =use-package= loads packages.
 
    #+BEGIN_SRC emacs-lisp
-      (require 'package)
-      (setq package-enable-at-startup nil)
-      (setq package-archives '(("org" . "http://orgmode.org/elpa/")
-                               ("melpa" . "http://melpa.org/packages/")
-                               ("melpa-stable" . "http://stable.melpa.org/packages/")
-                               ("gnu" . "https://elpa.gnu.org/packages/")))
-      (package-initialize)
+     (require 'package)
+     (setq package-enable-at-startup nil)
+     (setq package-archives '(("org" . "http://orgmode.org/elpa/")
+                              ("melpa" . "http://melpa.org/packages/")
+                              ("melpa-stable" . "http://stable.melpa.org/packages/")
+                              ("gnu" . "https://elpa.gnu.org/packages/")))
+     (package-initialize)
 
-      (unless (package-installed-p 'use-package)
-        (package-refresh-contents)
-        (package-install 'use-package))
+     (unless (package-installed-p 'use-package)
+       (package-refresh-contents)
+       (package-install 'use-package))
 
-      (eval-when-compile
-        (require 'use-package))
+     (eval-when-compile
+       (require 'use-package))
 
      (setq use-package-always-ensure t)
    #+END_SRC
@@ -229,21 +230,20 @@
    me.
 
    #+BEGIN_SRC emacs-lisp
-          (use-package evil
-            :ensure t
-            :init
-      (setq evil-want-integration t)
-      (setq evil-want-keybinding nil)
-                      :config (progn
-                                (evil-mode 1)                                                         ;; Enable evil mode everywhere
-                                (define-key evil-normal-state-map (kbd ";") 'evil-ex)                 ;; Swap ; and : for easier command entering (normal mode)
-                                (define-key evil-visual-state-map (kbd ";") 'evil-ex)                 ;; Swap ; and : for easier command entering (visual mode)
-                                (define-key evil-motion-state-map (kbd ":") 'evil-repeat-find-char))) ;; I don't use this much, but map it for completeness
+     (use-package evil
+       :ensure t
+       :init
+       (setq evil-want-integration t)
+       (setq evil-want-keybinding nil)
+       :config (progn
+                 (evil-mode 1)                                                         ;; Enable evil mode everywhere
+                 (define-key evil-normal-state-map (kbd ";") 'evil-ex)                 ;; Swap ; and : for easier command entering (normal mode)
+                 (define-key evil-visual-state-map (kbd ";") 'evil-ex)                 ;; Swap ; and : for easier command entering (visual mode)
+                 (define-key evil-motion-state-map (kbd ":") 'evil-repeat-find-char))) ;; I don't use this much, but map it for completeness
 
 
      ;; (with-eval-after-load 'evil-maps
      ;;   (define-key evil-insert-state-map (kbd "RET") 'newline-and-indent))
-
    #+END_SRC
 
 ** [[https://github.com/emacs-evil/evil-collection][evil-collection]]
@@ -258,8 +258,7 @@
        :ensure t
        :custom
        (evil-collection-setup-minibuffer t)
-       :config
-       (setq evil-collection-mode-list (delete 'dired evil-collection-mode-list))
+       :config (setq evil-collection-mode-list (delete 'dired evil-collection-mode-list))
        (evil-collection-init))
    #+END_SRC
 
@@ -310,18 +309,15 @@
    functionality and submit a pull-request or create a fork of the package.
 
    #+BEGIN_SRC emacs-lisp
-        ;; (use-package evil-numbers
+     ;; (use-package evil-numbers
      ;;    :ensure
-     ;; :config
-
+     ;;    :config
      ;;    (define-key evil-normal-state-map (kbd "C-A")
      ;;   'evil-numbers/inc-at-pt)
      ;; (define-key evil-normal-state-map (kbd "C-S-A")
      ;;   'evil-numbers/dec-at-pt)
      ;; )
    #+END_SRC
-
-
 
 * Language server protocol
 
@@ -340,7 +336,6 @@
        :init (setq lsp-inhibit-message t
                    lsp-eldoc-render-all nil
                    lsp-highlight-symbol-at-point nil))
-
 
      (add-hook 'after-init-hook #'global-flycheck-mode)
      (use-package company-lsp
@@ -369,118 +364,100 @@
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
    lsp-mode support for java
    #+BEGIN_SRC emacs-lisp
-   (use-package lsp-java :ensure t :after lsp
+   (use-package lsp-java
+     :ensure t
+     :after lsp
      :config (add-hook 'java-mode-hook 'lsp))
    #+END_SRC
-
 
 * Filetypes
 ** config-general-mode, general unix files
    #+BEGIN_SRC emacs-lisp
-   (use-package config-general-mode
-   :ensure t
-   :mode ("\\.conf$" "\\.*rc$"))
+     (use-package config-general-mode
+       :ensure t
+       :mode ("\\.conf$" "\\.*rc$"))
 
- (use-package ssh-config-mode
-   :ensure t
-   :mode ("/\\.ssh/config\\'" "/system/ssh\\'" "/sshd?_config\\'" "/known_hosts\\'" "/authorized_keys2?\\'")
-   :hook (ssh-config-mode . turn-on-font-lock)
-   :config
-   (autoload 'ssh-config-mode "ssh-config-mode" t))
+     (use-package ssh-config-mode
+       :ensure t
+       :mode ("/\\.ssh/config\\'" "/system/ssh\\'" "/sshd?_config\\'" "/known_hosts\\'" "/authorized_keys2?\\'")
+       :hook (ssh-config-mode . turn-on-font-lock)
+       :config
+       (autoload 'ssh-config-mode "ssh-config-mode" t))
 
- (use-package logview
-   :ensure t
-   :mode ("syslog\\(?:\\.[0-9]+\\)" "\\.log\\(?:\\.[0-9]+\\)?\\'"))
+     (use-package logview
+       :ensure t
+       :mode ("syslog\\(?:\\.[0-9]+\\)" "\\.log\\(?:\\.[0-9]+\\)?\\'"))
 
- (use-package yaml-mode
-   :ensure t
-   :mode (".yaml$"))
+     (use-package yaml-mode
+       :ensure t
+       :mode (".yaml$"))
 
- (use-package yaml-tomato
-   :ensure t)
+     (use-package yaml-tomato
+       :ensure t)
 
- (use-package vimrc-mode
-   :ensure t
-   :mode ("^\\.vimrc\\'"))
+     (use-package vimrc-mode
+       :ensure t
+       :mode ("^\\.vimrc\\'"))
    #+END_SRC
-
-
 
 ** graphviz
    #+BEGIN_SRC emacs-lisp
-
-(use-package graphviz-dot-mode
-  :ensure t
-  :init
-  (defvar default-tab-width nil)
-
-  :mode ("\\.dot\\'"))
-
+     (use-package graphviz-dot-mode
+       :ensure t
+       :init
+       (defvar default-tab-width nil)
+       :mode ("\\.dot\\'"))
    #+END_SRC
-
 
 ** Latex Export
 
+   Most times I use latex it will have some kind of code-blocks in it. I almost
+   always want code syntax-highlighting and use the =minted= package for it.
+   Some additional options are passed to the latex command, which is set to
+   =xelatex=.
+
    #+BEGIN_SRC emacs-lisp
-;; Include the latex-exporter
-(require 'ox-latex)
-;; Add minted to the defaults packages to include when exporting.
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-;; Tell the latex export to use the minted package for source
-;; code coloration.
-(setq org-latex-listings 'minted)
-;; Let the exporter use the -shell-escape option to let latex
-;; execute external programs.
-;; This obviously and can be dangerous to activate!
-(setq org-latex-pdf-process
-      '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
-(setq org-latex-minted-options
-'(("frame" "lines") ("breaklines" "true")  ("frame" "single") ))
-
+     (require 'ox-latex)
+     (add-to-list 'org-latex-packages-alist '("" "minted"))
+     (setq org-latex-listings 'minted)
+     (setq org-latex-pdf-process
+           '("xelatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+     (setq org-latex-minted-options
+           '(("frame" "lines") ("breaklines" "true")  ("frame" "single") ))
    #+END_SRC
-
-
 
 * Completion and snippets
 ** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
-   Use ivy for selecting things, also add recent files and bookmarks to the list and set a custom date format.
+   Use ivy for selecting things, also add recent files and bookmarks to the list
+   and set a custom date format.
+
    #+BEGIN_SRC emacs-lisp
+     (use-package ivy
+       :ensure t
+       :config
+       (ivy-mode)
+       (setq ivy-display-style 'fancy
+             ivy-use-virtual-buffers t
+             enable-recursive-minibuffers t
+             ivy-use-selectable-prompt t))
 
-(use-package ivy
-  :ensure t
-  :config
-  (ivy-mode)
-  (setq ivy-display-style 'fancy
-        ivy-use-virtual-buffers t
-        enable-recursive-minibuffers t
-        ivy-use-selectable-prompt t))
+     (use-package counsel :ensure t
+       :bind
+       :config
+       (ivy-mode 1)
+       (setq ivy-use-virtual-buffers t)       ;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
+       (setq ivy-height 10)                   ;; number of result lines to display
+       (setq ivy-count-format "%d/%d ")       ;; set a default count format
+       ;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
+       (setq ivy-re-builders-alist
+             '((t   . ivy--regex-fuzzy))))    ;; configure regexp engine to use fuzzy finding
 
-
-
-
-    (use-package counsel :ensure t
-      :bind
-      :config
-      (ivy-mode 1)
-      (setq ivy-use-virtual-buffers t)              ;; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer’.
-      (setq ivy-height 10)                ;; number of result lines to display
-      (setq ivy-count-format "%d/%d ")              ;; set a default count format
-                      ;; (setq ivy-initial-inputs-alist nil) ;; no regexp by default
-      (setq ivy-re-builders-alist
-        '((t   . ivy--regex-fuzzy))))             ;; configure regexp engine to use fuzzy finding
-
-
-
-
-
-(setq counsel-find-file-ignore-regexp
-        (concat
-         ;; File names beginning with # or .
-         "\\(?:\\`[#.]\\)"
-         ;; File names ending with # or ~
-         "\\|\\(?:\\`.+?[#~]\\'\\)"))
-
+     (setq counsel-find-file-ignore-regexp
+           (concat
+            ;; File names beginning with # or .
+            "\\(?:\\`[#.]\\)"
+            ;; File names ending with # or ~
+            "\\|\\(?:\\`.+?[#~]\\'\\)"))
    #+END_SRC
 
 ** [[https://github.com/lewang/flx][flx]]
@@ -726,7 +703,7 @@
   bound to that key. I took a few ideas from spacemacs (namely using =SPC= for
   my leader) and bind all keys to mnemonics that make sense to me. In
   combination with which-key I find them easy to remember and instead of just
-  using spacemacs I can keep adding the ones I really need.
+  using spacemacs I can keep addingrthe ones I really need.
 
 ** [[https://github.com/noctuid/general.el][general.el]]
    More convenient key definitions in emacs
