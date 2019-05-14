@@ -95,6 +95,13 @@
   (setq save-interprogram-paste-before-kill t)
    #+END_SRC
 
+   The way emacs cleans up seaching hightlight confuses me. With this setting it
+   behaves more like vim's search and =:noh= also works as expected.
+
+    #+BEGIN_SRC emacs-lisp
+    (setq lazy-highlight-cleanup nil)
+    #+END_SRC
+
    Some settings to start with a notes org-mode file. I have disabled them for now
    as I like the rather useless but good-looking dashboard
 
@@ -241,6 +248,8 @@
                  (define-key evil-motion-state-map (kbd ":") 'evil-repeat-find-char))) ;; I don't use this much, but map it for completeness
 
 
+       (evil-define-key 'normal 'global "/" 'swiper)
+
      ;; (with-eval-after-load 'evil-maps
      ;;   (define-key evil-insert-state-map (kbd "RET") 'newline-and-indent))
    #+END_SRC
@@ -331,34 +340,36 @@
   [[https://github.com/tigersoldier/company-lsp][company-lsp]] (integration for my autocompletion package)
 
    #+BEGIN_SRC emacs-lisp
-     (use-package lsp-mode
-       :ensure t
-       :init (setq lsp-inhibit-message t
-                   lsp-eldoc-render-all nil
-                   lsp-highlight-symbol-at-point nil))
+          (use-package lsp-mode
+            :ensure t
+            :init (setq lsp-inhibit-message t
+                        lsp-eldoc-render-all nil
+                        lsp-highlight-symbol-at-point nil))
 
-     (add-hook 'after-init-hook #'global-flycheck-mode)
-     (use-package company-lsp
-       :after  company
-       :ensure t
-       :config
-       (setq company-lsp-enable-snippet t
-             company-lsp-cache-candidates t))
+          (add-hook 'after-init-hook #'global-flycheck-mode)
+          (use-package company-lsp
+            :after  company
+            :ensure t
+            :config
+            (setq company-lsp-enable-snippet t
+                  company-lsp-cache-candidates t))
 
-     ;; (push 'company-lsp company-backends)
 
-     (use-package lsp-ui
-       :ensure t
-       :config
-       (setq lsp-ui-sideline-enable t
-             lsp-ui-sideline-show-symbol t
-             lsp-ui-sideline-show-hover t
-             lsp-ui-flycheck-enable t
-             lsp-ui-imenu-enable t
-             ;; lsp-ui-doc-enable nil
-             ;; lsp-ui-sideline-ignore-duplicate t
-             lsp-ui-sideline-show-code-actions t
-             lsp-ui-sideline-update-mode 'point))
+          (use-package lsp-ui
+            :ensure t
+            :config
+            (setq lsp-ui-sideline-enable t
+                  lsp-ui-sideline-show-symbol t
+                  lsp-ui-sideline-show-hover t
+                  lsp-ui-flycheck-enable t
+                  lsp-ui-imenu-enable t
+                  ;; lsp-ui-doc-enable nil
+                  ;; lsp-ui-sideline-ignore-duplicate t
+                  lsp-ui-sideline-show-code-actions t
+                  lsp-ui-sideline-update-mode 'point))
+
+
+     (add-hook 'python-mode-hook #'lsp)
    #+END_SRC
 
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
@@ -371,7 +382,7 @@
      :config (add-hook 'java-mode-hook 'lsp))
    #+END_SRC
 
-* Filetypes
+* File-types
 ** config-general-mode, general unix files
    #+BEGIN_SRC emacs-lisp
      (use-package config-general-mode
@@ -427,6 +438,7 @@
            '(("frame" "lines") ("breaklines" "true")  ("frame" "single") ))
    #+END_SRC
 
+
 * Completion and snippets
 ** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
 
@@ -436,6 +448,8 @@
    with backup and autosave files, I ignore filenames beginning with =#= or
    ending with =#= or =~=.
 
+   I set the matching algorithm to fuzzy (using flx) everywhere except in
+   swiper. When searching in files I most often am looking for a particular string
 
    #+BEGIN_SRC emacs-lisp
      (use-package ivy
@@ -443,7 +457,7 @@
        :config
        (ivy-mode)
        (setq ivy-display-style 'fancy
-         ivy-format-function 'ivy-format-function-line ; Make highlight extend all the way to the right
+             ivy-format-function 'ivy-format-function-line ; Make highlight extend all the way to the right
              ivy-use-virtual-buffers t      ;;
              ivy-height 10
              ivy-count-format "[%d/%d] "
@@ -455,13 +469,15 @@
               "\\(?:\\`[#.]\\)"
               "\\|\\(?:\\`.+?[#~]\\'\\)")))
 
+
      (setq ivy-re-builders-alist
-           '((t   . ivy--regex-fuzzy)))    ;; configure regexp engine to use fuzzy finding, together with flx
+           '((swiper . ivy--regex-plus)
+             (t      . ivy--regex-fuzzy)))
    #+END_SRC
 
    Ivy-rich displays additional information for the items in ivy. I use mostly
-   the default config for it for now, but there is more room for customization
-   and improvemend here.
+   the default configuration for it for now, but there is more room for customization
+   and improvement here.
 
    #+BEGIN_SRC emacs-lisp
      (use-package ivy-rich
@@ -516,15 +532,23 @@
      (setq ivy-format-function #'ivy-format-function-line)
    #+END_SRC
 
+
 ** [[https://github.com/lewang/flx][flx]]
+
+   I use flx which provides a better fuzzy matching algorithm for ivy. The
+   details are explained on it's GitHub page, all I can say is: it works better
+   for me. Setting =ivy--regex-fuzzy= splits each character with a wild card.
+   Searching for "for" returns all "f.*o.*r" matches, resulting in a large
+   number of hits. Ivy sorts such large lists using flx package's scoring
+   mechanism automatically, if installed.
+
    #+BEGIN_SRC emacs-lisp
      (use-package flx
        :ensure t
        :config
-       (setq ivy-initial-inputs-alist nil)
-       )
-
+       (setq ivy-initial-inputs-alist nil))
    #+END_SRC
+
 ** [[https://github.com/company-mode/company-mode][company-mode]]
    Modular in-buffer completion framework for Emacs
    #+BEGIN_SRC emacs-lisp
@@ -560,6 +584,7 @@
          (set-face-attribute 'company-scrollbar-bg nil :inherit 'company-tooltip :background "gray20")
          (set-face-attribute 'company-scrollbar-fg nil :background "gray40"))
 
+
        ;; Activating globally
        (global-company-mode t)
 
@@ -577,6 +602,10 @@
          :init (add-hook 'global-company-mode-hook #'company-quickhelp-mode)
          )
          )
+
+
+
+          (push 'company-lsp company-backends)
    #+END_SRC
 
 
