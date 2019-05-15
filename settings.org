@@ -1139,38 +1139,29 @@
    #+END_SRC
 
 ** Themes
-   Also install some themes. I load gruvbox per default and switch sometimes.
-   #+BEGIN_SRC emacs-lisp
-     (use-package gruvbox-theme :ensure t :defer t)
-     ;; (use-package base16-theme :ensure t :defer t)
-     ;; (load-theme 'gruvbox-dark-hard t)
-     (load-theme 'doom-one t)
+   Also install some themes. If I'll be looking at this the whole day, it might
+   as well look nice.
+   
+*** doom-themes
+    
+    #+BEGIN_SRC emacs-lisp
+      (use-package doom-themes
+        :init
+        (load-theme 'doom-one t)
+        :config
+        (progn
+          (doom-themes-neotree-config)
+          (doom-themes-org-config)))
+      ;; (setq doom-neotree-line-spacing 0)
+    #+END_SRC
+    
+*** gruvbox
+     #+BEGIN_SRC emacs-lisp
+       ;; (use-package gruvbox-theme :ensure t :defer t)
+       ;; (load-theme 'gruvbox-dark-hard t)
+     #+END_SRC
+   
 
-     ;; (defun check-expansion ()
-     ;;   (save-excursion
-     ;;     (if (looking-at "\\_>") t
-     ;;       (backward-char 1)
-     ;;       (if (looking-at "\\.") t
-     ;;         (backward-char 1)
-     ;;         (if (looking-at "->") t nil)))))
-
-     ;; (defun do-yas-expand ()
-     ;;   (let ((yas/fallback-behavior 'return-nil))
-     ;;     (yas/expand)))
-
-     ;; (defun tab-indent-or-complete ()
-     ;;   (interactive)
-     ;;   (if (minibufferp)
-     ;;       (minibuffer-complete)
-     ;;     (if (or (not yas/minor-mode)
-     ;;             (null (do-yas-expand)))
-     ;;         (if (check-expansion)
-     ;;             (company-complete-common)
-     ;;           (indent-for-tab-command)))))
-
-     ;; (global-set-key [tab] 'tab-indent-or-complete)
-
-   #+END_SRC
 
 * TODO
 *** TODO bind swiper to /
@@ -1187,3 +1178,29 @@
     it uses the (usually consistent and mnemonic) default key bindings for those
     modes instead of mixing with Evil unpredictably.
 *** TODO reference Spacemacs to get ideas for language-specific packages to install.
+*** TODO misc
+  #+BEGIN_SRC  emacs-lisp
+          ;; (defun check-expansion ()
+          ;;   (save-excursion
+          ;;     (if (looking-at "\\_>") t
+          ;;       (backward-char 1)
+          ;;       (if (looking-at "\\.") t
+          ;;         (backward-char 1)
+          ;;         (if (looking-at "->") t nil)))))
+
+          ;; (defun do-yas-expand ()
+          ;;   (let ((yas/fallback-behavior 'return-nil))
+          ;;     (yas/expand)))
+
+          ;; (defun tab-indent-or-complete ()
+          ;;   (interactive)
+          ;;   (if (minibufferp)
+          ;;       (minibuffer-complete)
+          ;;     (if (or (not yas/minor-mode)
+          ;;             (null (do-yas-expand)))
+          ;;         (if (check-expansion)
+          ;;             (company-complete-common)
+          ;;           (indent-for-tab-command)))))
+
+          ;; (global-set-key [tab] 'tab-indent-or-complete)
+  #+END_SRC
