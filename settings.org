@@ -1,4 +1,17 @@
 * General options
+  This is my literate Emacs configuration. I have copied, adapted and integrated
+  parts from more sources than I can keep track of. I keep changing this file
+  as I find new tools and redifine my workflows. I'd like to thank all
+  the people how published there configurations, snippets and insights and helped me starting out with
+  emacs and fixing probems I encountered, but I'm sure I'll forget someone.
+  Instead I'll do the same and share this file aswell in the hope that someone
+  can profit from it.
+
+#+BEGIN_QUOTE
+Sharing is good, and with digital technology, sharing is easy.
+
+     -- Richard Stallman
+ #+END_QUOTE
 
 ** Personal information
    Start by setting some personal information. It is used in tools like git when
