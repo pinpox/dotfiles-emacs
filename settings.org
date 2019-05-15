@@ -672,22 +672,20 @@
 
 * Org-Mode
   #+BEGIN_SRC emacs-lisp
-  (defun ck/org-confirm-babel-evaluate (lang body)
-  (not (or (string= lang "latex") (string= lang "dot"))))
-(setq org-confirm-babel-evaluate 'ck/org-confirm-babel-evaluate)
+    (defun ck/org-confirm-babel-evaluate (lang body)
+      (not (or (string= lang "latex") (string= lang "dot"))))
+    (setq org-confirm-babel-evaluate 'ck/org-confirm-babel-evaluate)
 
+    (add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
+    (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((dot . t))) ; this line activates dot
 
-(add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
-(add-hook 'org-mode-hook 'turn-on-auto-fill)
-
-
-
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((dot . t))) ; this line activates dot
-
+    (load-library "find-lisp")
+    (setq org-agenda-files
+          (find-lisp-find-files "~/org-files" "\.org$"))
   #+END_SRC
 ** [[https://github.com/sabof/org-bullets][org-bullets]]
    Make the bullets in org-mode look nicer with UTF-8 characters
@@ -697,6 +695,7 @@
      :demand
      :config
      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
    #+END_SRC
 
 * Linting, spellcheck and reformatting
@@ -1141,9 +1140,9 @@
 ** Themes
    Also install some themes. If I'll be looking at this the whole day, it might
    as well look nice.
-   
+
 *** doom-themes
-    
+
     #+BEGIN_SRC emacs-lisp
       (use-package doom-themes
         :init
@@ -1154,13 +1153,13 @@
           (doom-themes-org-config)))
       ;; (setq doom-neotree-line-spacing 0)
     #+END_SRC
-    
+
 *** gruvbox
      #+BEGIN_SRC emacs-lisp
        ;; (use-package gruvbox-theme :ensure t :defer t)
        ;; (load-theme 'gruvbox-dark-hard t)
      #+END_SRC
-   
+
 
 
 * TODO
