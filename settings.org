@@ -7,11 +7,10 @@
   Instead I'll do the same and share this file aswell in the hope that someone
   can profit from it.
 
-#+BEGIN_QUOTE
-Sharing is good, and with digital technology, sharing is easy.
-
-     -- Richard Stallman
- #+END_QUOTE
+  #+BEGIN_QUOTE
+  Sharing is good, and with digital technology, sharing is easy.
+  -- Richard Stallman
+  #+END_QUOTE
 
 ** Personal information
    Start by setting some personal information. It is used in tools like git when
@@ -30,17 +29,17 @@ Sharing is good, and with digital technology, sharing is easy.
 
 ** Memory Management
 
-    Let's allow more than 800 KiB cache before starting garbage collection. Every
-    time memory crosses a certain threshold, it garbage collects. But the
-    default value for this threshold is quite low by modern standards. Another
-    low threshold is hit when opening files with sizes that are common nowadays
-    and Emacs warns you about being wary of opening such a large file. I
-    increase that limit too. I have RAM to spare.
+   Let's allow more than 800 KiB cache before starting garbage collection. Every
+   time memory crosses a certain threshold, it garbage collects. But the
+   default value for this threshold is quite low by modern standards. Another
+   low threshold is hit when opening files with sizes that are common nowadays
+   and Emacs warns you about being wary of opening such a large file. I
+   increase that limit too. I have RAM to spare.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
    (setq gc-cons-threshold 50000000)
    (setq large-file-warning-threshold 100000000)
-    #+END_SRC
+   #+END_SRC
 
 ** Default encoding (UTF-8)
    Use UTF-8 by default. I don't see why utf-8 should not be used everywhere as
@@ -111,9 +110,9 @@ Sharing is good, and with digital technology, sharing is easy.
    The way emacs cleans up seaching hightlight confuses me. With this setting it
    behaves more like vim's search and =:noh= also works as expected.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (setq lazy-highlight-cleanup nil)
-    #+END_SRC
+   #+END_SRC
 
    Some settings to start with a notes org-mode file. I have disabled them for now
    as I like the rather useless but good-looking dashboard
@@ -352,7 +351,7 @@ Sharing is good, and with digital technology, sharing is easy.
   In emacs I use [[https://github.com/emacs-lsp/lsp-mode][lsp-mode]] together with [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]] (higher level UI modules) and
   [[https://github.com/tigersoldier/company-lsp][company-lsp]] (integration for my autocompletion package)
 
-   #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
           (use-package lsp-mode
             :ensure t
             :init (setq lsp-inhibit-message t
@@ -383,7 +382,7 @@ Sharing is good, and with digital technology, sharing is easy.
 
 
      (add-hook 'python-mode-hook #'lsp)
-   #+END_SRC
+  #+END_SRC
 
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
 
@@ -471,11 +470,11 @@ Sharing is good, and with digital technology, sharing is easy.
        (ivy-mode)
        (setq ivy-display-style 'fancy
              ivy-format-function 'ivy-format-function-line ; Make highlight extend all the way to the right
-             ivy-use-virtual-buffers t      ;;
-             ivy-height 10
+             ivy-use-virtual-buffers t
              ivy-count-format "[%d/%d] "
              enable-recursive-minibuffers t
              ivy-use-selectable-prompt t)
+
 
        (setq counsel-find-file-ignore-regexp
              (concat
@@ -483,9 +482,23 @@ Sharing is good, and with digital technology, sharing is easy.
               "\\|\\(?:\\`.+?[#~]\\'\\)")))
 
 
+
      (setq ivy-re-builders-alist
            '((swiper . ivy--regex-plus)
              (t      . ivy--regex-fuzzy)))
+
+
+
+   #+END_SRC
+
+
+   #+BEGIN_SRC emacs-lisp
+
+(setq ivy-height-alist
+      '((t
+         lambda (_caller)
+         (/ (frame-height) 3))))
+
    #+END_SRC
 
    Ivy-rich displays additional information for the items in ivy. I use mostly
@@ -909,6 +922,7 @@ Sharing is good, and with digital technology, sharing is easy.
        (setq jiralib-url "https://desk.committance.com")
        )
    #+END_SRC
+
 * Spellcheck
   #+BEGIN_SRC emacs-lisp
 
@@ -1091,7 +1105,6 @@ Sharing is good, and with digital technology, sharing is easy.
      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
    #+END_SRC
 
-
 ** [[https://github.com/tarsius/hl-todo][hl-todo]]
 
    Minor mode for coloring TODO, NOTE, FIXME and many more keywords of
@@ -1114,12 +1127,24 @@ Sharing is good, and with digital technology, sharing is easy.
    #+END_SRC
 
 
+** [[https://github.com/emacsmirror/rainbow-mode][rainbow-mode]]
+   A minor mode for Emacs which displays strings representing colors with the
+   color they represent as background.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package rainbow-mode
+       :ensure t
+       :config
+       (add-hook 'prog-mode-hook 'rainbow-mode))
+   #+END_SRC
+
 ** Themes
    Also install some themes. I load gruvbox per default and switch sometimes.
    #+BEGIN_SRC emacs-lisp
      (use-package gruvbox-theme :ensure t :defer t)
      ;; (use-package base16-theme :ensure t :defer t)
-     (load-theme 'gruvbox-dark-hard t)
+     ;; (load-theme 'gruvbox-dark-hard t)
+     (load-theme 'doom-one t)
 
      ;; (defun check-expansion ()
      ;;   (save-excursion
