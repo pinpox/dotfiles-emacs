@@ -420,11 +420,13 @@
 
     ;; Enable LSP for some languages
     (add-hook 'python-mode-hook #'lsp)
-    (add-hook 'python-mode-hook 'flycheck-mode)
+    (add-hook 'go-mode-hook #'lsp)
+    (add-hook 'java-mode-hook #'lsp)
 
     ;; Enable flycheck-mode to display flycheck diagnostics
     (add-hook 'go-mode-hook 'flycheck-mode)
-    (add-hook 'go-mode-hook #'lsp)
+    (add-hook 'python-mode-hook 'flycheck-mode)
+    (add-hook 'java-mode-hook 'flycheck-mode)
   #+END_SRC
 
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
@@ -691,10 +693,6 @@
 
          ;; Activate global
          (yas-global-mode)))
-
-
-
-
 
      (use-package yasnippet-snippets :ensure t)
      (use-package ivy-yasnippet :ensure t)
