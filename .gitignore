@@ -6,3 +6,5 @@ backup/
 /settings.el
 /transient
 /autosave
+.lsp-session*
+tags
