@@ -18,13 +18,13 @@
    supports it without plugins since version 26.
 
    #+BEGIN_SRC emacs-lisp :tangle yes
-    (setq user-full-name "Pablo Ovelleiro Corral"
-          user-mail-address "pablo1@mailbox.org"
-          mail-host-address "mailbox.org"
-          mail-default-reply-to "pablo@mailbox.org")
+     (setq user-full-name "Pablo Ovelleiro Corral"
+           user-mail-address "pablo1@mailbox.org"
+           mail-host-address "mailbox.org"
+           mail-default-reply-to "pablo@mailbox.org")
 
-    (require 'auth-source-pass)
-    (auth-source-pass-enable)
+     (require 'auth-source-pass)
+     (auth-source-pass-enable)
    #+END_SRC
 
 ** Memory Management
@@ -149,19 +149,81 @@
    #+END_SRC
 
 ** Indentation and whitespace
-   Establish an indentation and whitespace standard I follow. Trailing whitespace
-   is deleted on saving, this might cause problems someday and break a file, but
-   I have yet to come across a case where it happens.
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (setq-default tab-width 2
-                   indent-tabs-mode nil)
 
-     (setq standard-indent 2
-           show-trailing-whitespace t
+   Establish an indentation and whitespace standard I follow. When coming to
+   tabs vs. spaces for indentation, there is literally a [[https://www.jwz.org/doc/tabs-vs-spaces.html][war]] going on. I prefer
+   tabs for most languages, lisp excluded.
+
+   To be able to define the indentation-style on per-language basis, here are to
+   interactive functions, which can be called manually or in a hook to set the
+   style for a buffer or a language. The size of tabs is extracted into a
+   variable, so I set it once and use it as needed.
+
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     ;; Create a variable for our preferred tab width
+     (setq custom-tab-width 4)
+
+     ;; Two callable functions for enabling/disabling tabs in Emacs
+     (defun disable-tabs () (setq indent-tabs-mode nil))
+     (defun enable-tabs  ()
+       (local-set-key (kbd "TAB") 'tab-to-tab-stop)
+       (setq indent-tabs-mode t)
+       (setq tab-width custom-tab-width))
+   #+END_SRC
+
+   I set tabs as default and then revert the setting for those languages on
+   which I want spaces.
+
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'prog-mode-hook 'enable-tabs)
+
+     (add-hook 'lisp-mode-hook 'disable-tabs)
+     (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
+     (add-hook 'org-mode-hook 'disable-tabs)
+
+     ;; Language-Specific Tweaks
+     (setq-default python-indent-offset custom-tab-width) ;; Python
+     (setq-default js-indent-level custom-tab-width)      ;; Javascript
+
+     ;; Making electric-indent behave sanely
+     (setq-default electric-indent-inhibit t)
+
+     ;; Make the backspace properly erase the tab instead of
+     ;; removing 1 space at a time.
+     (setq backward-delete-char-untabify-method 'hungry)
+
+     ;; Shift width for evil-mode: vim-like motions of ">>" and "<<".
+     (setq-default evil-shift-width custom-tab-width)
+   #+END_SRC
+
+   To display indentation guides I use [[https://github.com/DarthFennec/highlight-indent-guides][highlight-indent-guides]]. It seems to work
+   well with any indentation style and looks fancy with some settings.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package highlight-indent-guides
+       :config
+       (setq highlight-indent-guides-delay 0)
+       (setq highlight-indent-guides-method 'character)
+       ;; (setq highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
+       (setq highlight-indent-guides-responsive 'top)
+       (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+       (add-hook 'org-mode-hook 'highlight-indent-guides-mode))
+   #+END_SRC
+
+   Lastly some sane defaults. Trailing whitespace is deleted on save and I set
+   the fill-collum to 80, which breaks up line while typing after the 80th
+   character. The last line fixes the strange behaviour of the backspace key of
+   deleting tabs only one space at a time. Pressing backspace on a tab should
+   delete it.
+
+   #+BEGIN_SRC emacs-lisp
+     (setq whitespace-style '(face trailing))
+     (global-whitespace-mode)
+     (setq show-trailing-whitespace t
            sentence-end-double-space nil
            default-fill-column 80)
-
      (add-hook 'before-save-hook 'delete-trailing-whitespace)
+     (setq backward-delete-char-untabify-method 'hungry)
    #+END_SRC
 
 ** Scrolling
@@ -197,35 +259,8 @@
            auto-revert-verbose nil)
    #+END_SRC
 
-   Small convenience functions to clean up the current buffer. The first one
-   removes trailing whitespace and replaces all tabs with spaces before save.
-   The last one I've got on a key bound further down in geleral.el - it also
-   indents the entire buffer.
-
-   #+BEGIN_SRC emacs-lisp
-     (defun cleanup-buffer-safe ()
-       "Perform a bunch of safe operations on the whitespace content of a buffer.
-     Does not indent buffer, because it is used for a before-save-hook, and that
-     might be bad."
-       (interactive)
-       (untabify (point-min) (point-max))
-       (delete-trailing-whitespace)
-       (set-buffer-file-coding-system 'utf-8))
-
-     ;; Various superfluous white-space. Just say no.
-     (add-hook 'before-save-hook 'cleanup-buffer-safe)
-
-     (defun cleanup-buffer ()
-       "Perform a bunch of operations on the whitespace content of a buffer.
-     Including indent-buffer, which should not be called automatically on save."
-       (interactive)
-       (cleanup-buffer-safe)
-       (indent-region (point-min) (point-max)))
-   #+END_SRC
-
-
-   Another function I find useful: Kill all other buffers (except the current
-   one). I Bind this to a key in general, as I use it quite a lot.
+   A function I find useful: Kill all other buffers (except the current one). I
+   Bind this to a key in general, as I use it quite a lot.
 
    #+BEGIN_SRC emacs-lisp
      (defun kill-other-buffers ()
@@ -352,36 +387,44 @@
   [[https://github.com/tigersoldier/company-lsp][company-lsp]] (integration for my autocompletion package)
 
   #+BEGIN_SRC emacs-lisp
-          (use-package lsp-mode
-            :ensure t
-            :init (setq lsp-inhibit-message t
-                        lsp-eldoc-render-all nil
-                        lsp-highlight-symbol-at-point nil))
+    (use-package lsp-mode
+      :ensure t
+      :init (setq lsp-inhibit-message t
+                  lsp-eldoc-render-all nil
+                  lsp-highlight-symbol-at-point nil))
 
-          (add-hook 'after-init-hook #'global-flycheck-mode)
-          (use-package company-lsp
-            :after  company
-            :ensure t
-            :config
-            (setq company-lsp-enable-snippet t
-                  company-lsp-cache-candidates t))
-
-
-          (use-package lsp-ui
-            :ensure t
-            :config
-            (setq lsp-ui-sideline-enable t
-                  lsp-ui-sideline-show-symbol t
-                  lsp-ui-sideline-show-hover t
-                  lsp-ui-flycheck-enable t
-                  lsp-ui-imenu-enable t
-                  ;; lsp-ui-doc-enable nil
-                  ;; lsp-ui-sideline-ignore-duplicate t
-                  lsp-ui-sideline-show-code-actions t
-                  lsp-ui-sideline-update-mode 'point))
+    (add-hook 'after-init-hook #'global-flycheck-mode)
+    (use-package company-lsp
+      :after  company
+      :ensure t
+      :config
+      (setq company-lsp-enable-snippet t
+            company-lsp-cache-candidates t))
 
 
-     (add-hook 'python-mode-hook #'lsp)
+    (use-package lsp-ui
+      :ensure t
+      :config
+      (setq lsp-ui-sideline-enable t
+            lsp-ui-sideline-show-symbol t
+            lsp-ui-sideline-show-hover t
+            lsp-ui-flycheck-enable t
+            lsp-ui-imenu-enable t
+            ;; lsp-ui-doc-enable nil
+            ;; lsp-ui-sideline-ignore-duplicate t
+            lsp-ui-sideline-show-code-actions t
+            lsp-ui-sideline-update-mode 'point))
+
+
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
+    ;; Enable LSP for some languages
+    (add-hook 'python-mode-hook #'lsp)
+    (add-hook 'python-mode-hook 'flycheck-mode)
+
+    ;; Enable flycheck-mode to display flycheck diagnostics
+    (add-hook 'go-mode-hook 'flycheck-mode)
+    (add-hook 'go-mode-hook #'lsp)
   #+END_SRC
 
 ** [[https://github.com/emacs-lsp/lsp-java][lsp-java]]
@@ -399,7 +442,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package config-general-mode
        :ensure t
-       :mode ("\\.conf$" "\\.*rc$"))
+       :mode ("\\.conf$" "\\.*rc$" ".ini"))
 
      (use-package ssh-config-mode
        :ensure t
@@ -705,8 +748,8 @@
 
 ** [[https://github.com/yjwen/org-reveal][org-reveal]]
 
-    Reveal.js is a tool for creating HTML presentations. Org-Reveal exports your
-    Org documents to reveal.js presentations.
+    Reveal.js is a tool for creating HTML presentations. Org-Reveal exports Org
+    documents to reveal.js presentations.
 
    #+BEGIN_SRC emacs-lisp
      (use-package ox-reveal
@@ -908,12 +951,12 @@
         "bo" '(kill-other-buffers :which-key "Kill other buffers")
         "bd" '(kill-buffer-and-window :which-key "kill buffer and window")
         "TAB"  '(ivy-switch-buffer :which-key "switch buffer")
-        "b=" '(cleanup-buffer :which-key "Cleanup current buffer")
+        "b=" '(format-all-buffer :which-key "Cleanup current buffer")
 
 
         ;; Projects
         "p" '(:ignore t :which-key "Project")
-        "pp" '(counsel-projectile :which-key "Switch project")
+        "pp" '(counsel-projectile-switch-project :which-key "Switch project")
         "pf" '(counsel-projectile-find-file :which-key "Project file")
         "p/" '(counsel-projectile-ag :which-key "Search project")
 
@@ -1176,10 +1219,10 @@
     #+END_SRC
 
 *** gruvbox
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
        ;; (use-package gruvbox-theme :ensure t :defer t)
        ;; (load-theme 'gruvbox-dark-hard t)
-     #+END_SRC
+    #+END_SRC
 
 
 
@@ -1199,7 +1242,7 @@
     modes instead of mixing with Evil unpredictably.
 *** TODO reference Spacemacs to get ideas for language-specific packages to install.
 *** TODO misc
-  #+BEGIN_SRC  emacs-lisp
+    #+BEGIN_SRC  emacs-lisp
           ;; (defun check-expansion ()
           ;;   (save-excursion
           ;;     (if (looking-at "\\_>") t
@@ -1223,4 +1266,4 @@
           ;;           (indent-for-tab-command)))))
 
           ;; (global-set-key [tab] 'tab-indent-or-complete)
-  #+END_SRC
+    #+END_SRC
