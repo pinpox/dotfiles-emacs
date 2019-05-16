@@ -156,11 +156,8 @@
 
    To be able to define the indentation-style on per-language basis, here are to
    interactive functions, which can be called manually or in a hook to set the
-   style for a buffer or a language. I set tabs as defualt and then revert the
-   setting for those languages on which I want spaces.
-
-   The size of tabs is extracted into a variable, so I set it once and use it as
-   needed.
+   style for a buffer or a language. The size of tabs is extracted into a
+   variable, so I set it once and use it as needed.
 
    #+BEGIN_SRC emacs-lisp :tangle yes
      ;; Create a variable for our preferred tab width
@@ -172,10 +169,14 @@
        (local-set-key (kbd "TAB") 'tab-to-tab-stop)
        (setq indent-tabs-mode t)
        (setq tab-width custom-tab-width))
+   #+END_SRC
 
-     ;; Hooks to Enable Tabs
+   I set tabs as default and then revert the setting for those languages on
+   which I want spaces.
+
+   #+BEGIN_SRC emacs-lisp
      (add-hook 'prog-mode-hook 'enable-tabs)
-     ;; Hooks to Disable Tabs
+
      (add-hook 'lisp-mode-hook 'disable-tabs)
      (add-hook 'emacs-lisp-mode-hook 'disable-tabs)
      (add-hook 'org-mode-hook 'disable-tabs)
@@ -193,28 +194,17 @@
 
      ;; Shift width for evil-mode: vim-like motions of ">>" and "<<".
      (setq-default evil-shift-width custom-tab-width)
-
-     ;; WARNING: This will change your life
-     ;; (OPTIONAL) Visualize tabs as a pipe character - "|"
-     ;; This will also show trailing characters as they are useful to spot.
-     (setq whitespace-style '(face trailing))
-     ;; (custom-set-faces
-     ;;  '(whitespace-tab ((t (:foreground "#636363")))))
-     ;; (setq whitespace-display-mappings
-     ;;   '((tab-mark 9 [124 9] [92 9]))) ; 124 is the ascii ID for '\|'
-     (global-whitespace-mode) ; Enable whitespace mode everywhere
    #+END_SRC
-
 
    To display indentation guides I use [[https://github.com/DarthFennec/highlight-indent-guides][highlight-indent-guides]]. It seems to work
    well with any indentation style and looks fancy with some settings.
+
    #+BEGIN_SRC emacs-lisp
-     ;; Indent character samples: | ┆ ┊
      (use-package highlight-indent-guides
        :config
        (setq highlight-indent-guides-delay 0)
        (setq highlight-indent-guides-method 'character)
-       ;; (setq highlight-indent-guides-character ?\┆)
+       ;; (setq highlight-indent-guides-character ?\┆) ;; Indent character samples: | ┆ ┊
        (setq highlight-indent-guides-responsive 'top)
        (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
        (add-hook 'org-mode-hook 'highlight-indent-guides-mode))
@@ -227,10 +217,12 @@
    delete it.
 
    #+BEGIN_SRC emacs-lisp
+     (setq whitespace-style '(face trailing))
+     (global-whitespace-mode)
      (setq show-trailing-whitespace t
            sentence-end-double-space nil
            default-fill-column 80)
-     ;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
+     (add-hook 'before-save-hook 'delete-trailing-whitespace)
      (setq backward-delete-char-untabify-method 'hungry)
    #+END_SRC
 
