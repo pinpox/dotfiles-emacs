@@ -1,3 +1,4 @@
+#+STARTUP: content
 * General options
   This is my literate Emacs configuration. I have copied, adapted and integrated
   parts from more sources than I can keep track of. I keep changing this file
