@@ -1139,6 +1139,76 @@
 (add-hook 'shell-mode-hook (lambda ()
                                                           (linum-mode -1)))
   #+END_SRC
+* Notmuch
+
+  After coming back to thunderbird from various email-clients I have tried, this
+  is now my attempt of using notmuch with emacs to manage my email. The setup is
+  pretty common: notmuch + offlineimap + msmtp.
+
+  Starting with notmuch itself I set a few general options that make it a bit
+  nicer to use, like killing buffers after sending messages. No need to keep
+  them open. Also in most cases I want to have the newest messages at the top.
+  #+BEGIN_SRC emacs-lisp
+    (require 'notmuch) ; loads notmuch package
+    (setq message-directory "~/mail")
+    (setq notmuch-show-logo nil)
+    (setq message-kill-buffer-on-exit t) ; kill buffer after sending mail)
+    (setq notmuch-search-oldest-first nil) ;; Newest messages first
+    (setq message-default-mail-headers "Cc: \nBcc: \n")
+    (setq notmuch-archive-tags '("-inbox" "+archived"))
+  #+END_SRC
+
+  To get msmtp to work correctly the following options have to be set. The only
+ trick here seems to be getting emacs to actually pass the envelope from.
+
+#+BEGIN_SRC emacs-lisp
+(setq notmuch-always-prompt-for-sender 't)
+    (setq mail-specify-envelope-from t)
+    (setq message-sendmail-envelope-from 'header)
+    (setq mail-envelope-from 'header)
+    (setq message-send-mail-function 'message-send-mail-with-sendmail)
+    ;; sendmail-program "~/dev/mail/msmtp-enqueue.sh"
+     ;; (setq sendmail-program "/usr/share/doc/msmtp/msmtpqueue/msmtp-enqueue.sh")
+#+END_SRC
+
+Specify where send messages should be stored. I set the accounts individually as
+I don't want the messages to be mixed up later.
+#+BEGIN_SRC emacs-lisp
+  (setq notmuch-fccA-dirs '(("pablo1@mailbox.org" . "mailbox/Sent -inbox +sent -unread")
+                           ;; ("sean.escriva@gmail.com" . "seanescriva-gmail.com/sent")
+  (".*" . "sent")))
+
+#+END_SRC
+
+
+;; mail contacts
+#+BEGIN_SRC emacs-lisp
+(require 'notmuch-address)
+(setq notmuch-address-command "~/bin/notmuch-contacts.sh")
+(notmuch-address-message-insinuate)
+#+END_SRC
+
+  #+BEGIN_SRC emacs-lisp
+
+
+    ;;     notmuch-show-all-multipart/alternative-parts nil
+    ;;     mime-edit-pgp-signers '("C84EF897")
+    ;;     mime-edit-pgp-encrypt-to-self t
+    ;;     mml2015-encrypt-to-self t
+    ;;     mml2015-sign-with-sender t
+    ;;     notmuch-crypto-process-mime t
+    ;;     message-sendmail-f-is-evil nil
+    ;;     mail-interactive t
+    ;;     mail-user-agent 'message-user-agent
+    ;;     ;; notmuch-fcc-dirs '((".*" . "Defunct/Sent"))
+    ;;     notmuch-show-indent-messages-width 4
+    ;;     notmuch-saved-searches '((:name "inbox" :query "tag:inbox" :key "i")
+    ;;                              (:name "unread" :query "tag:unread" :key "u")
+    ;;                              (:name "flagged" :query "tag:flagged" :key "f")
+    ;;                              (:name "sent" :query "tag:sent" :key "t")
+    ;;                              (:name "drafts" :query "tag:draft" :key "d")
+    ;;                              (:name "all mail" :query "*" :key "a")))
+  #+END_SRC
 * Appearance
 
   Removes the menu,tool and scrollbars along with the splash-screen.
@@ -1302,3 +1372,10 @@
 
           ;; (global-set-key [tab] 'tab-indent-or-complete)
     #+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'default-frame-alist '(font . "Terminus 12"))
+  ;; (set-face-attribute 'default t :font "Terminus 12")
+
+#+END_SRC
