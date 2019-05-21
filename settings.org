@@ -1,4 +1,6 @@
+#+AUTHOR: Pablo Ovelleiro Corral <pablo1@mailbox.org>
 #+STARTUP: content
+
 * General options
   This is my literate Emacs configuration. I have copied, adapted and integrated
   parts from more sources than I can keep track of. I keep changing this file
@@ -1023,36 +1025,34 @@
 
 * Spellcheck
   #+BEGIN_SRC emacs-lisp
+    (when (executable-find "hunspell")
+      (setq-default ispell-program-name "hunspell")
+      (setq ispell-really-hunspell t))
 
-(when (executable-find "hunspell")
-  (setq-default ispell-program-name "hunspell")
-  (setq ispell-really-hunspell t))
+    ;; easy spell check
+    (global-set-key (kbd "<f8>") 'ispell-word)
+    (global-set-key (kbd "S-<f8>") 'flyspell-buffer)
+    (defun flyspell-check-next-highlighted-word ()
+      "Custom function to spell check next highlighted word"
+      (interactive)
+      (flyspell-goto-next-error)
+      (ispell-word)
+      )
+    (global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
 
-;; easy spell check
-(global-set-key (kbd "<f8>") 'ispell-word)
-(global-set-key (kbd "S-<f8>") 'flyspell-buffer)
-(defun flyspell-check-next-highlighted-word ()
-  "Custom function to spell check next highlighted word"
-  (interactive)
-  (flyspell-goto-next-error)
-  (ispell-word)
-  )
-(global-set-key (kbd "M-<f8>") 'flyspell-check-next-highlighted-word)
-
-(eval-after-load "flyspell"
-  '(progn
-     (defun flyspell-goto-next-and-popup ( )
-       "Goto the next spelling error, popup menu, and stop when the end of buffer is reached."
-       (interactive)
-       (while (< (point) (point-max))
-     (flyspell-goto-next-error)
-     (redisplay)
-     (flyspell-correct-word-before-point))
-       (message "No more spelling errors in buffer.")
-       )
-     ))
-(define-key flyspell-mode-map (kbd "C-<f8>") 'flyspell-goto-next-and-popup)
-
+    (eval-after-load "flyspell"
+      '(progn
+         (defun flyspell-goto-next-and-popup ( )
+           "Goto the next spelling error, popup menu, and stop when the end of buffer is reached."
+           (interactive)
+           (while (< (point) (point-max))
+             (flyspell-goto-next-error)
+             (redisplay)
+             (flyspell-correct-word-before-point))
+           (message "No more spelling errors in buffer.")
+           )
+         ))
+    (define-key flyspell-mode-map (kbd "C-<f8>") 'flyspell-goto-next-and-popup)
   #+END_SRC
 * Eshell
 
