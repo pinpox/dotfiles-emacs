@@ -1174,10 +1174,10 @@
 Specify where send messages should be stored. I set the accounts individually as
 I don't want the messages to be mixed up later.
 #+BEGIN_SRC emacs-lisp
-  (setq notmuch-fccA-dirs '(("pablo1@mailbox.org" . "mailbox/Sent -inbox +sent -unread")
-                           ;; ("sean.escriva@gmail.com" . "seanescriva-gmail.com/sent")
-  (".*" . "sent")))
-
+  (setq notmuch-fcc-dirs '(
+                           ("pablo1@mailbox.org" . "mailbox/Sent -inbox +sent -unread")
+                           ("pablo.ovelleiro@committance.com" . "committance/Sent -inbox +sent -unread")
+                           (".*" . "sent")))
 #+END_SRC
 
 
