@@ -1184,8 +1184,48 @@ I don't want the messages to be mixed up later.
 ;; mail contacts
 #+BEGIN_SRC emacs-lisp
 (require 'notmuch-address)
-(setq notmuch-address-command "~/bin/notmuch-contacts.sh")
+(setq notmuch-archive-tags '("-unread" "+archived"))
 (notmuch-address-message-insinuate)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+
+
+  (use-package gnus-alias
+    :ensure t
+    :config
+
+    (progn
+      ;; (autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
+      ;; Define two identities, "home" and "work"
+      (setq gnus-alias-identity-alist
+            '(("mailbox"
+               nil ;; Does not refer to any other identity
+               "Pablo Ovelleiro Corral <pablo1@mailbox.org>" ;; Sender address
+               nil ;; No organization header
+               nil ;; No extra headers
+               nil ;; No extra body text
+               "~/Documents/sig_mailbox.txt")
+              ("committance"
+               nil
+               "Pablo Ovelleiro Corral <pablo.ovelleiro@committance.com>"
+               "committance AG"
+               nil ;; (("Bcc" . "john.doe@example.com"))
+               nil
+               "~/Documents/sig_committance.txt")))
+      ;; Use "home" identity by default
+      (setq gnus-alias-default-identity "mailbox")
+      ;; Define rules to match work identity
+      (setq gnus-alias-identity-rules
+            '(
+              ("committance"
+               ("any" "<\\(.+\\)\\@committance\\.com" both) "committance")
+              )
+            )
+      ;; Determine identity when message-mode loads
+      (add-hook 'message-setup-hook 'gnus-alias-determine-identity)
+      )
+    )
 #+END_SRC
 
   #+BEGIN_SRC emacs-lisp

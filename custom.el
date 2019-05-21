@@ -19,7 +19,7 @@
      (:name "all mail" :query "*" :key "a"))))
  '(package-selected-packages
    (quote
-    (counsel-notmuch highlight-indent-guides go-mode dracula-theme doom-themes bug-hunter org-jira dokuwiki ivy-yasnippet vimrc-mode yaml-tomato yaml-mode logview ssh-config-mode config-general-mode yasnippet-snippets yasnippet-classic-snippets xml-rpc which-key use-package twilight-theme twilight-anti-bright-theme spaceline snazzy-theme ox-wk org-pdfview org-bullets mediawiki lsp-ui lsp-java lenlen-theme latex-preview-pane ivy-hydra gruvbox-theme graphviz-dot-mode go-eldoc git-gutter general fzf format-all flycheck flx evil-org evil-magit evil-leader evil-commentary evil-collection dokuwiki-mode diff-hl dashboard cycle-themes counsel-tramp counsel-projectile company-quickhelp company-lsp company-go beacon auctex apache-mode ample-theme)))
+    (gnus-alias counsel-notmuch highlight-indent-guides go-mode dracula-theme doom-themes bug-hunter org-jira dokuwiki ivy-yasnippet vimrc-mode yaml-tomato yaml-mode logview ssh-config-mode config-general-mode yasnippet-snippets yasnippet-classic-snippets xml-rpc which-key use-package twilight-theme twilight-anti-bright-theme spaceline snazzy-theme ox-wk org-pdfview org-bullets mediawiki lsp-ui lsp-java lenlen-theme latex-preview-pane ivy-hydra gruvbox-theme graphviz-dot-mode go-eldoc git-gutter general fzf format-all flycheck flx evil-org evil-magit evil-leader evil-commentary evil-collection dokuwiki-mode diff-hl dashboard cycle-themes counsel-tramp counsel-projectile company-quickhelp company-lsp company-go beacon auctex apache-mode ample-theme)))
  '(send-mail-function (quote smtpmail-send-it))
  '(smtpmail-smtp-server "smtp.mailbox.org")
  '(smtpmail-smtp-service 25)
