@@ -501,6 +501,22 @@
    #+END_SRC
 
 
+** go
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package go-mode
+  :ensure t
+  :mode ("\\.go\\'" . go-mode))
+
+(use-package go-eldoc
+  :ensure t
+  :after (go-mode)
+  :hook (go-mode . go-eldoc-setup))
+
+(add-hook 'go-mode-hook 'lsp)
+
+#+END_SRC
 * Completion and snippets
 ** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
 
@@ -1138,6 +1154,14 @@
 (setq eshell-prompt-function 'esh-prompt-func)
 (add-hook 'shell-mode-hook (lambda ()
                                                           (linum-mode -1)))
+  #+END_SRC
+* Encryption
+
+  This will force Emacs to use its own internal password prompt instead of an
+  external [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][pin entry program]].
+
+  #+BEGIN_SRC emacs-lisp
+(setenv "GPG_AGENT_INFO" nil)
   #+END_SRC
 * Notmuch
 
