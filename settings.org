@@ -1291,6 +1291,7 @@
         (:name "sent" :query "tag:sent" :key "t")
         (:name "drafts" :query "tag:draft" :key "d")
         (:name "all mail" :query "*" :key "a")))
+		)
   #+END_SRC
 * Calendar and TODOs
   #+BEGIN_SRC emacs-lisp
@@ -1374,9 +1375,22 @@
          holiday-islamic-holidays nil
          holiday-hebrew-holidays nil)
 
-   (require 'calfw)
-   (require 'calfw-org)
   #+END_SRC
+
+** [[https://github.com/kiwanami/emacs-calfw][calfw]]
+
+A calendar framework for Emacs
+
+  #+BEGIN_SRC emacs-lisp
+    (use-package calfw
+      :ensure t
+      :commands (cfw:open-calendar-buffer))
+
+    (use-package calfw-org
+      :ensure t
+      :commands (cfw:open-org-calendar))
+  #+END_SRC
+
 * Appearance
 
   Removes the menu,tool and scrollbars along with the splash-screen.
