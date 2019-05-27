@@ -1374,7 +1374,6 @@
          holiday-bahai-holidays nil
          holiday-islamic-holidays nil
          holiday-hebrew-holidays nil)
-
   #+END_SRC
 
 ** [[https://github.com/kiwanami/emacs-calfw][calfw]]
@@ -1509,55 +1508,4 @@ A calendar framework for Emacs
     #+BEGIN_SRC emacs-lisp
        ;; (use-package gruvbox-theme :ensure t :defer t)
        ;; (load-theme 'gruvbox-dark-hard t)
-    #+END_SRC
-
-
-
-* TODO
-*** TODO bind swiper to /
-*** TODO evil-textobj-between.el
-*** TODO evil-numbers
-*** TODO Add keybindings to jira-commands with general
-*** TODO use global ensure
-*** TODO password-store-el
-** Some ideas (taken from https://medium.com/@CBowdon/pinching-the-best-bits-from-spacemacs-869b8c793ad3)
-*** TODO Try eglot instaed of lsp-mode https://github.com/cbowdon/Config/blob/master/emacs/init.org
-*** TODO A shortcut to edit my init file (a literate init file with Org mode, which is great).
-*** TODO One key departure from Spacemacs:
-    adding special modes like dired and VC to the evil-emacs-state-map, so that
-    it uses the (usually consistent and mnemonic) default key bindings for those
-    modes instead of mixing with Evil unpredictably.
-*** TODO reference Spacemacs to get ideas for language-specific packages to install.
-*** TODO misc
-    #+BEGIN_SRC  emacs-lisp
-          ;; (defun check-expansion ()
-          ;;   (save-excursion
-          ;;     (if (looking-at "\\_>") t
-          ;;       (backward-char 1)
-          ;;       (if (looking-at "\\.") t
-          ;;         (backward-char 1)
-          ;;         (if (looking-at "->") t nil)))))
-
-          ;; (defun do-yas-expand ()
-          ;;   (let ((yas/fallback-behavior 'return-nil))
-          ;;     (yas/expand)))
-
-          ;; (defun tab-indent-or-complete ()
-          ;;   (interactive)
-          ;;   (if (minibufferp)
-          ;;       (minibuffer-complete)
-          ;;     (if (or (not yas/minor-mode)
-          ;;             (null (do-yas-expand)))
-          ;;         (if (check-expansion)
-          ;;             (company-complete-common)
-          ;;           (indent-for-tab-command)))))
-
-          ;; (global-set-key [tab] 'tab-indent-or-complete)
-    #+END_SRC
-
-
-    #+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'default-frame-alist '(font . "Terminus 12"))
-  ;; (set-face-attribute 'default t :font "Terminus 12")
-
     #+END_SRC
