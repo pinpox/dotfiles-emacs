@@ -1,4 +1,6 @@
+#+AUTHOR: Pablo Ovelleiro Corral <pablo1@mailbox.org>
 #+STARTUP: content
+
 * General options
   This is my literate Emacs configuration. I have copied, adapted and integrated
   parts from more sources than I can keep track of. I keep changing this file
@@ -499,6 +501,22 @@
    #+END_SRC
 
 
+** go
+
+#+BEGIN_SRC emacs-lisp
+
+(use-package go-mode
+  :ensure t
+  :mode ("\\.go\\'" . go-mode))
+
+(use-package go-eldoc
+  :ensure t
+  :after (go-mode)
+  :hook (go-mode . go-eldoc-setup))
+
+(add-hook 'go-mode-hook 'lsp)
+
+#+END_SRC
 * Completion and snippets
 ** [[https://github.com/abo-abo/swiper][ivy/swiper/counsel]]
 
@@ -991,7 +1009,7 @@
         ;; Org
         "o"  '(:ignore t :which-key "Org")
         "ol" '(org-toggle-link-display :which-key "Toggle link visibility")
-        ;; "ov" '(visible-mode :which-key "Toggle visibility")
+        "ov" '(visible-mode :which-key "Toggle visibility")
 
         ;; Windows
         "w"  '(:ignore t :which-key "Window")
@@ -1158,6 +1176,14 @@
 (add-hook 'shell-mode-hook (lambda ()
                                                           (linum-mode -1)))
   #+END_SRC
+* Encryption
+
+  This will force Emacs to use its own internal password prompt instead of an
+  external [[https://www.masteringemacs.org/article/keeping-secrets-in-emacs-gnupg-auth-sources][pin entry program]].
+
+  #+BEGIN_SRC emacs-lisp
+(setenv "GPG_AGENT_INFO" nil)
+  #+END_SRC
 * Notmuch
 
   After coming back to thunderbird from various email-clients I have tried, this
@@ -1203,34 +1229,56 @@
   ;; mail contacts
   #+BEGIN_SRC emacs-lisp
 (require 'notmuch-address)
-(setq notmuch-address-command "~/bin/notmuch-contacts.sh")
+(setq notmuch-archive-tags '("-unread" "+archived"))
 (notmuch-address-message-insinuate)
-  #+END_SRC
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+
+
+  (use-package gnus-alias
+    :ensure t
+    :config
+
+    (progn
+      ;; (autoload 'gnus-alias-determine-identity "gnus-alias" "" t)
+      ;; Define two identities, "home" and "work"
+      (setq gnus-alias-identity-alist
+            '(("mailbox"
+               nil ;; Does not refer to any other identity
+               "Pablo Ovelleiro Corral <pablo1@mailbox.org>" ;; Sender address
+               nil ;; No organization header
+               nil ;; No extra headers
+               nil ;; No extra body text
+               "~/Documents/sig_mailbox.txt")
+              ("committance"
+               nil
+               "Pablo Ovelleiro Corral <pablo.ovelleiro@committance.com>"
+               "committance AG"
+               nil ;; (("Bcc" . "john.doe@example.com"))
+               nil
+               "~/Documents/sig_committance.txt")))
+      ;; Use "home" identity by default
+      (setq gnus-alias-default-identity "mailbox")
+      ;; Define rules to match work identity
+      (setq gnus-alias-identity-rules
+            '(
+              ("committance"
+               ("any" "<\\(.+\\)\\@committance\\.com" both) "committance")
+              )
+            )
+      ;; Determine identity when message-mode loads
+      (add-hook 'message-setup-hook 'gnus-alias-determine-identity)
+      )
+    )
+#+END_SRC
 
   #+BEGIN_SRC emacs-lisp
 
 
-       ;;     notmuch-show-all-multipart/alternative-parts nil
-       ;;     mime-edit-pgp-signers '("C84EF897")
-       ;;     mime-edit-pgp-encrypt-to-self t
-       ;;     mml2015-encrypt-to-self t
-       ;;     mml2015-sign-with-sender t
-       ;;     notmuch-crypto-process-mime t
-       ;;     message-sendmail-f-is-evil nil
-       ;;     mail-interactive t
-       ;;     mail-user-agent 'message-user-agent
-       ;;     ;; notmuch-fcc-dirs '((".*" . "Defunct/Sent"))
-       ;;     notmuch-show-indent-messages-width 4
-       ;;     notmuch-saved-searches '((:name "inbox" :query "tag:inbox" :key "i")
-       ;;                              (:name "unread" :query "tag:unread" :key "u")
-       ;;                              (:name "flagged" :query "tag:flagged" :key "f")
-       ;;                              (:name "sent" :query "tag:sent" :key "t")
-       ;;                              (:name "drafts" :query "tag:draft" :key "d")
-       ;;                              (:name "all mail" :query "*" :key "a")))
-        ;; (setq notmuch-saved-searches '((:name "All Inboxes"
-        ;;                                :query "tag:inbox"
-        ;;                                :count-query "tag:inbox and tag:unread"
-        ;;                                :sort-order oldest-first)))
+  (use-package gnus-alias
+    :ensure t
+    :config
 
 
 
