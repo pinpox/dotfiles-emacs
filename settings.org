@@ -712,17 +712,17 @@
          (append (if (consp backend) backend (list backend))
                  '(:with company-yasnippet))))
      (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-     #+END_SRC
+   #+END_SRC
 
-     Then working with yasnippet I use tab to exand snippets. Emacs is quite
-     smart when it comes to indenting new lines, but sometimes I just want to
-     insert a tab. The follwing function checks if I'm trying to expand a
-     snippet, if not it just inserts a tab. There is also the
-     =indent-for-tab-command= function (and others), but I keep having problems
-     with it and just inserting a tab is good enought for me. Let the tab just
-     be tab, I have =>>= and =<<= to indent.
+   Then working with yasnippet I use tab to exand snippets. Emacs is quite
+   smart when it comes to indenting new lines, but sometimes I just want to
+   insert a tab. The follwing function checks if I'm trying to expand a
+   snippet, if not it just inserts a tab. There is also the
+   =indent-for-tab-command= function (and others), but I keep having problems
+   with it and just inserting a tab is good enought for me. Let the tab just
+   be tab, I have =>>= and =<<= to indent.
 
-     #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
        (defun check-expansion ()
          (save-excursion
            (if (looking-at "\\_>") t
@@ -765,6 +765,26 @@
     (load-library "find-lisp")
     (setq org-agenda-files
           (find-lisp-find-files "~/org-files" "\.org$"))
+  #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp
+
+  (setq org-capture-templates
+        '(
+          ("t"    ; hotkey
+           "TODO (personal)" ; name
+           entry   ; type
+                                          ; heading and title
+           (file+headline "~/org-files/todo.org" "Personal")
+           "* TODO %^{Description}\n%?\n\t%i\n\t%a%U")
+
+          ("T"    ; hotkey
+           "TODO (work)" ; name
+           entry   ; type
+                                          ; heading and title
+           (file+headline "~/org-files/todo.org" "Committance")
+           "* TODO %^{Description}\n%?\n\t%i\n\t%a%U")
+          ))
   #+END_SRC
 
 ** [[https://github.com/sabof/org-bullets][org-bullets]]
@@ -948,8 +968,7 @@
         "/"  '(counsel-ag :wich-key "ag")
         "."  '(avy-goto-word-or-subword-1  :which-key "go to word")
         ;; "a" '(hydra-launcher/body :which-key "Applications")
-        "c"  '(:ignore t :which-key "comment")
-        "cl" '(comment-or-uncomment-region-or-line :which-key "comment line")
+        "c"  '(counsel-org-capture  :which-key "org Capture")
         ;; "w" '(hydra-window/body :which-key "Window")
 
         ;; Files
@@ -972,7 +991,7 @@
         ;; Org
         "o"  '(:ignore t :which-key "Org")
         "ol" '(org-toggle-link-display :which-key "Toggle link visibility")
-        "ov" '(visible-mode :which-key "Toggle visibility")
+        ;; "ov" '(visible-mode :which-key "Toggle visibility")
 
         ;; Windows
         "w"  '(:ignore t :which-key "Window")
@@ -1159,9 +1178,9 @@
   #+END_SRC
 
   To get msmtp to work correctly the following options have to be set. The only
- trick here seems to be getting emacs to actually pass the envelope from.
+  trick here seems to be getting emacs to actually pass the envelope from.
 
-#+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
 (setq notmuch-always-prompt-for-sender 't)
     (setq mail-specify-envelope-from t)
     (setq message-sendmail-envelope-from 'header)
@@ -1169,45 +1188,146 @@
     (setq message-send-mail-function 'message-send-mail-with-sendmail)
     ;; sendmail-program "~/dev/mail/msmtp-enqueue.sh"
      ;; (setq sendmail-program "/usr/share/doc/msmtp/msmtpqueue/msmtp-enqueue.sh")
-#+END_SRC
+  #+END_SRC
 
-Specify where send messages should be stored. I set the accounts individually as
-I don't want the messages to be mixed up later.
-#+BEGIN_SRC emacs-lisp
+  Specify where send messages should be stored. I set the accounts individually as
+  I don't want the messages to be mixed up later.
+  #+BEGIN_SRC emacs-lisp
   (setq notmuch-fccA-dirs '(("pablo1@mailbox.org" . "mailbox/Sent -inbox +sent -unread")
                            ;; ("sean.escriva@gmail.com" . "seanescriva-gmail.com/sent")
   (".*" . "sent")))
 
-#+END_SRC
+  #+END_SRC
 
 
-;; mail contacts
-#+BEGIN_SRC emacs-lisp
+  ;; mail contacts
+  #+BEGIN_SRC emacs-lisp
 (require 'notmuch-address)
 (setq notmuch-address-command "~/bin/notmuch-contacts.sh")
 (notmuch-address-message-insinuate)
-#+END_SRC
+  #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
 
 
-    ;;     notmuch-show-all-multipart/alternative-parts nil
-    ;;     mime-edit-pgp-signers '("C84EF897")
-    ;;     mime-edit-pgp-encrypt-to-self t
-    ;;     mml2015-encrypt-to-self t
-    ;;     mml2015-sign-with-sender t
-    ;;     notmuch-crypto-process-mime t
-    ;;     message-sendmail-f-is-evil nil
-    ;;     mail-interactive t
-    ;;     mail-user-agent 'message-user-agent
-    ;;     ;; notmuch-fcc-dirs '((".*" . "Defunct/Sent"))
-    ;;     notmuch-show-indent-messages-width 4
-    ;;     notmuch-saved-searches '((:name "inbox" :query "tag:inbox" :key "i")
-    ;;                              (:name "unread" :query "tag:unread" :key "u")
-    ;;                              (:name "flagged" :query "tag:flagged" :key "f")
-    ;;                              (:name "sent" :query "tag:sent" :key "t")
-    ;;                              (:name "drafts" :query "tag:draft" :key "d")
-    ;;                              (:name "all mail" :query "*" :key "a")))
+       ;;     notmuch-show-all-multipart/alternative-parts nil
+       ;;     mime-edit-pgp-signers '("C84EF897")
+       ;;     mime-edit-pgp-encrypt-to-self t
+       ;;     mml2015-encrypt-to-self t
+       ;;     mml2015-sign-with-sender t
+       ;;     notmuch-crypto-process-mime t
+       ;;     message-sendmail-f-is-evil nil
+       ;;     mail-interactive t
+       ;;     mail-user-agent 'message-user-agent
+       ;;     ;; notmuch-fcc-dirs '((".*" . "Defunct/Sent"))
+       ;;     notmuch-show-indent-messages-width 4
+       ;;     notmuch-saved-searches '((:name "inbox" :query "tag:inbox" :key "i")
+       ;;                              (:name "unread" :query "tag:unread" :key "u")
+       ;;                              (:name "flagged" :query "tag:flagged" :key "f")
+       ;;                              (:name "sent" :query "tag:sent" :key "t")
+       ;;                              (:name "drafts" :query "tag:draft" :key "d")
+       ;;                              (:name "all mail" :query "*" :key "a")))
+        ;; (setq notmuch-saved-searches '((:name "All Inboxes"
+        ;;                                :query "tag:inbox"
+        ;;                                :count-query "tag:inbox and tag:unread"
+        ;;                                :sort-order oldest-first)))
+
+
+
+    ;; (setq notmuch-archive-tags (quote ("-inbox" "+archived")))
+    (setq notmuch-saved-searches '
+       ((:name "mailbox" :query "folder:mailbox/INBOX")
+        (:name "committance" :query "folder:committance/INBOX" :key "f")
+        (:name "All Inboxes" :query "tag:inbox" :key "i")
+        (:name "unred" :query "tag:unred" :key "u")
+        (:name "sent" :query "tag:sent" :key "t")
+        (:name "drafts" :query "tag:draft" :key "d")
+        (:name "all mail" :query "*" :key "a")))
+  #+END_SRC
+* Calendar and TODOs
+  #+BEGIN_SRC emacs-lisp
+
+
+   (use-package org-caldav
+     :after (org org-agenda)
+     :ensure t
+     :config
+     (setq
+      org-caldav-calendars
+      `((:calendar-id "Y2FsOi8vMC8zMQ"
+                      :inbox "~/org-files/calendars/mailbox.org"
+                      :url "https://dav.mailbox.org/caldav/"
+                      :files ("~/org-files/calendars/mailbox.org")
+                      )
+
+        (:calendar-id "Y2FsOi8vMC81OA"
+                      :inbox "~/org-files/calendars/stundenplan.org"
+                      :url "https://dav.mailbox.org/caldav/"
+                      :files ("~/org-files/calendars/stundenplan.org")
+                      ;; :files ,(org-agenda-files)
+                      )
+
+        )
+
+  ;; (setq org-caldav-backup-file "~/org-files/calendars/org-caldav-backup.org")
+   ;; (setq org-caldav-save-directory "~/org-files/calendars/save.org/")
+   ;; (setq org-icalendar-alarm-time 1)
+
+   ;;    org-caldav-delete-org-entries 'ask
+   ;;    org-icalendar-include-todo t
+      ;; org-icalendar-timezone eqyiel/timezone
+      ;; org-icalendar-use-scheduled '(event-if-todo)
+      ))
+
+
+
+
+   (setq calendar-week-start-day 1) ; 0:Sunday, 1:Monday
+
+
+
+   (setq solar-n-hemi-seasons
+         '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
+
+   (setq holiday-general-holidays
+         '((holiday-fixed 1 1 "Neujahr")
+           (holiday-fixed 5 1 "1. Mai")
+           (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
+
+   (setq holiday-general-holidays
+         '((holiday-fixed 1 1 "Neujahr")
+           (holiday-fixed 5 1 "1. Mai")
+           (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
+
+   (setq holiday-christian-holidays
+         '((holiday-float 12 0 -4 "1. Advent" 24)
+           (holiday-float 12 0 -3 "2. Advent" 24)
+           (holiday-float 12 0 -2 "3. Advent" 24)
+           (holiday-float 12 0 -1 "4. Advent" 24)
+           (holiday-fixed 12 24 "Weihnachten")
+           (holiday-fixed 12 25 "1. Weihnachtstag")
+           (holiday-fixed 12 26 "2. Weihnachtstag")
+           (holiday-fixed 1 6 "Heilige Drei Könige")
+           (holiday-easter-etc -48 "Rosenmontag")
+           (holiday-easter-etc -3 "Gründonnerstag")
+           (holiday-easter-etc -2 "Karfreitag")
+           (holiday-easter-etc 0 "Ostersonntag")
+           (holiday-easter-etc +1 "Ostermontag")
+           (holiday-easter-etc +39 "Christi Himmelfahrt")
+           (holiday-easter-etc +49 "Pfingstsonntag")
+           (holiday-easter-etc +50 "Pfingstmontag")
+           (holiday-easter-etc +60 "Fronleichnam")
+           (holiday-fixed 8 15 "Mariae Himmelfahrt")
+           (holiday-fixed 11 1 "Allerheiligen")
+           (holiday-float 11 0 1 "Totensonntag" 20)))
+
+   (setq holiday-oriental-holidays nil
+         holiday-bahai-holidays nil
+         holiday-islamic-holidays nil
+         holiday-hebrew-holidays nil)
+
+   (require 'calfw)
+   (require 'calfw-org)
   #+END_SRC
 * Appearance
 
@@ -1374,8 +1494,8 @@ I don't want the messages to be mixed up later.
     #+END_SRC
 
 
-#+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
   ;; (add-to-list 'default-frame-alist '(font . "Terminus 12"))
   ;; (set-face-attribute 'default t :font "Terminus 12")
 
-#+END_SRC
+    #+END_SRC
