@@ -2,7 +2,7 @@
 #+STARTUP: content
 
 * General options
-  This is my literate Emacs configuration. I have copied, adapted and integrated
+  This is my [[https://de.wikipedia.org/wiki/Literate_programming][iterate Emacs]] configuration. I have copied, adapted and integrated
   parts from more sources than I can keep track of. I keep changing this file
   as I find new tools and redifine my workflows. I'd like to thank all
   the people how published there configurations, snippets and insights and helped me starting out with
@@ -122,7 +122,7 @@
 
    #+BEGIN_SRC emacs-lisp
     ;; (setq remember-notes-initial-major-mode 'org-mode)
-    ;; (setq remember-data-file "~/org/notes.org")
+    ;; (setq remember-data-file "~/Documents/org-files/notes.org")
     ;; (setq initial-buffer-choice 'remember-notes)
    #+END_SRC
 
@@ -769,20 +769,25 @@
 * Org-Mode
 
   #+BEGIN_SRC emacs-lisp
-    (defun ck/org-confirm-babel-evaluate (lang body)
-      (not (or (string= lang "latex") (string= lang "dot"))))
-    (setq org-confirm-babel-evaluate 'ck/org-confirm-babel-evaluate)
+        (defun ck/org-confirm-babel-evaluate (lang body)
+          (not (or (string= lang "latex") (string= lang "dot"))))
+        (setq org-confirm-babel-evaluate 'ck/org-confirm-babel-evaluate)
 
-    (add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
-    (add-hook 'org-mode-hook 'turn-on-auto-fill)
+        (add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
+        (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((dot . t))) ; this line activates dot
+        (org-babel-do-load-languages
+         'org-babel-load-languages
+         '((dot . t))) ; this line activates dot
 
-    (load-library "find-lisp")
-    (setq org-agenda-files
-          (find-lisp-find-files "~/org-files" "\.org$"))
+        (load-library "find-lisp")
+        (setq org-agenda-files
+              (find-lisp-find-files "~/Documents/org-files" "\.org$"))
+
+    ;; (setq org-agenda-files (list "~/Documents/org-files/todo.org"
+    ;;                              "~/Documents/org-files/calendar.org"
+    ;;                              "~/Documents/org/home.org"))
+
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
@@ -793,14 +798,14 @@
            "TODO (personal)" ; name
            entry   ; type
                                           ; heading and title
-           (file+headline "~/org-files/todo.org" "Personal")
+           (file+headline "~/Documents/org-files/todo.org" "Personal")
            "* TODO %^{Description}\n%?\n\t%i\n\t%a%U")
 
           ("T"    ; hotkey
            "TODO (work)" ; name
            entry   ; type
                                           ; heading and title
-           (file+headline "~/org-files/todo.org" "Committance")
+           (file+headline "~/Documents/org-files/todo.org" "Committance")
            "* TODO %^{Description}\n%?\n\t%i\n\t%a%U")
           ))
   #+END_SRC
@@ -933,7 +938,7 @@
        :bind-keymap
        ;; ("C-c p" . projectile-command-map)
        :config
-       (setq projectile-project-search-path '("~/Projects/" "~/Documents/" "~/org-files")))
+       (setq projectile-project-search-path '("~/Projects/" "~/Documents/" "~/Documents/org-files")))
      (projectile-mode +1)
    #+END_SRC
 ** [[https://github.com/ericdanan/counsel-projectile][counsel-projectile]]
@@ -1056,6 +1061,14 @@
        :config
        (setq jiralib-url "https://desk.committance.com")
        )
+
+
+
+(setq org-jira-custom-jqls
+  '(
+    (:jql " assignee = p.ovelleiro AND status != backlog AND resolution is EMPTY ORDER BY priority DESC "
+          :filename "my-issues")
+    ))
    #+END_SRC
 
 * Spellcheck
@@ -1496,7 +1509,7 @@ A calendar framework for Emacs
     #+BEGIN_SRC emacs-lisp
       (use-package doom-themes
         :init
-        (load-theme 'doom-one t)
+        (load-theme 'doom-one-light t)
         :config
         (progn
           (doom-themes-neotree-config)
