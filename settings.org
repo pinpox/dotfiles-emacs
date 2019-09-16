@@ -1507,13 +1507,13 @@ A calendar framework for Emacs
 *** doom-themes
 
     #+BEGIN_SRC emacs-lisp
-      (use-package doom-themes
-        :init
-        (load-theme 'doom-one-light t)
-        :config
-        (progn
-          (doom-themes-neotree-config)
-          (doom-themes-org-config)))
+      ;; (use-package doom-themes
+      ;;   :init
+      ;;   (load-theme 'doom-one-light t)
+      ;;   :config
+      ;;   (progn
+      ;;     (doom-themes-neotree-config)
+      ;;     (doom-themes-org-config)))
       ;; (setq doom-neotree-line-spacing 0)
     #+END_SRC
 
@@ -1521,4 +1521,8 @@ A calendar framework for Emacs
     #+BEGIN_SRC emacs-lisp
        ;; (use-package gruvbox-theme :ensure t :defer t)
        ;; (load-theme 'gruvbox-dark-hard t)
+    #+END_SRC
+*** dracula
+    #+BEGIN_SRC emacs-lisp
+    (load-theme 'dracula t)
     #+END_SRC

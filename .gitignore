@@ -13,3 +13,7 @@ eshell/
 workspace/
 projectile.cache
 request
+network-security.data
+url
+bookmarks
+.org-id-locations
