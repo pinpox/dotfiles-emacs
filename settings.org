@@ -1524,5 +1524,12 @@ A calendar framework for Emacs
     #+END_SRC
 *** dracula
     #+BEGIN_SRC emacs-lisp
-    (load-theme 'dracula t)
+      ;; (load-theme 'dracula t)
+    #+END_SRC
+
+*** base16-themes
+    #+BEGIN_SRC emacs-lisp
+    (use-package base16-theme :ensure t
+    :config
+    (load-theme 'base16-seti t))
     #+END_SRC
